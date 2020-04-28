@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript">
+        const id_produto = "{{id_produto}}";
+
+        function validar() {
+            const descricao = document.getElementById('descricao');
+            const cliente = document.getElementById('cliente');
+            if (descricao.value === '') {
+                alert("Preencha a descrição.");
+                return false;
+            }
+            if (cliente.value == "escolha") {
+                alert("Escolha o cliente.");
+                return false;
+            }
+            return true;
+        }
+
+        function salvar() {
+            if (!validar()) return;
+            document.getElementById("form_principal").submit();
+        }
+
+        function excluir() {
+            if (!confirm("Você tem certeza?")) return;
+            xhr = new XMLHttpRequest();
+            xhr.open('DELETE', '/produto/' + id_produto);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status === 200 || xhr.status === 404) {
+                    document.open();
+                    document.write(xhr.responseText);
+                    document.close();
+                } else {
+                    alert('Erro ' + xhr.status);
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</head>
+
+<body>
+
+    <form class="form-horizontal" action="/produto/{{id_produto}}/" method="POST" id="form_principal">
+        {% if id_produto != 'novo'%}
+        <p>
+            <label>Id:</label> {{id_produto}}
+        </p>
+        {% endif %}
+        <!-- Form Name -->
+        <legend>Cadastro de Produtos</legend>
+        <!-- Text input-->
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="descricao">Descrição</label>
+            <div class="col-md-2">
+                <input id="descricao" name="descricao" type="text" placeholder="" class="form-control input-md" value="{{descricao}}">
+
+            </div>
+        </div>
+
+        <!-- Select Basic -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="cliente">Cliente</label>
+            <div class="col-md-4">
+                <select id="id_cliente" name="cliente" class="form-control">
+              <option value="Escolha">Escolha...</option>
+              {% for cliente in clientes %}
+				<option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['nome']}}</option>
+			  {% endfor %}
+            </select>
+
+
+                <!-- Button (Double) -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="btnsalvar"></label>
+                    <div class="col-md-8">
+                        <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
+                        <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
+                    </div>
+                </div>
+
+    </form>
+
+</html>

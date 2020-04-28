@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!-- saved from url=(0031)http://127.0.0.1:5000/cliente/1 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cadastrar cliente</title>
+        <link rel="stylesheet" type="text/css" href="./Cadastrar cliente_files/format.css">
+        <script type="text/javascript">
+            function validar() {
+                const nome = document.getElementById('nome');
+                const sexo_masc = document.getElementById('sexo_masc');
+                const sexo_fem = document.getElementById('sexo_fem');
+                const telefone = document.getElementById('telefone');
+                const endereco = document.getElementById('endereco');
+
+                if (nome.value === '') {
+                    alert("Preencha o nome.");
+                    return false;
+                }
+                if (!sexo_masc.checked && !sexo_fem.checked) {
+                    alert("Escolha o sexo.");
+                    return false;
+                }
+                if (telefone.value === '') {
+                    alert("Preencha o telefone.");
+                    return false;
+                }
+                if (endereco.value === '') {
+                    alert("Preencha o endereço.");
+                    return false;
+                }
+                return true;
+            }
+
+            function salvar() {
+                if (!validar()) return;
+                document.getElementById("form_principal").submit();
+            }
+        </script>
+        <style>
+            
+        </style>
+    </head>
+    <body>
+        <form action="http://127.0.0.1:5000/cliente/1" method="POST" id="form_principal">
+            
+                <p>
+                    <label>Id:</label>
+                    1
+                </p>
+            
+            <p>
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" autocomplete="off" value="Gustavo Miranda">
+            </p>
+
+            <p>
+                <label for="telefone">Telefone:</label>:
+                <input type="text" id="telefone" name="telefone" autocomplete="off" value="66559988">
+            </p>
+
+            <p>
+                <label for="endereco">Endereço:</label>:
+                <input type="text" id="endereco" name="endereco" autocomplete="off" value="rua tinder, bairro Rolleman">
+            </p>
+
+
+            <p>
+                <label>Sexo:</label>
+                <input type="radio" id="sexo_masc" name="sexo" value="M" checked="checked">Masculino
+                <input type="radio" id="sexo_fem" name="sexo" value="F">Feminino
+            </p>
+            <p>
+                <button type="button" onclick="javascript:salvar();">Salvar</button>
+                <a href="http://127.0.0.1:5000/" class="botao">Voltar</a>
+            </p>
+        </form>
+    
+</body></html>

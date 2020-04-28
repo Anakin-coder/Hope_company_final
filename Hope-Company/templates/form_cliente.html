@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar cliente</title>
+    <link rel="stylesheet" type="text/css" href="/static/clientes.css"></link>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript">
+        function validar() {
+            const nome = document.getElementById('nome');
+            const sexo_masc = document.getElementById('sexo_masc');
+            const sexo_fem = document.getElementById('sexo_fem');
+            const telefone = document.getElementById('telefone');
+            const endereco = document.getElementById('endereco');
+
+            if (nome.value === '') {
+                alert("Preencha o nome.");
+                return false;
+            }
+            if (!sexo_masc.checked && !sexo_fem.checked) {
+                alert("Escolha o sexo.");
+                return false;
+            }
+            if (telefone.value === '') {
+                alert("Preencha o telefone.");
+                return false;
+            }
+            if (endereco.value === '') {
+                alert("Preencha o endereço.");
+                return false;
+            }
+            return true;
+        }
+
+        function salvar() {
+            if (!validar()) return;
+            document.getElementById("form_principal").submit();
+        }
+    </script>
+</head>
+
+<body>
+    <form class="form-horizontal" action="/cliente/{{id_cliente}}/" method="POST" id="form_principal">
+        {% if id_cliente != 'novo'%}
+        <p>
+            <label>Id:</label> {{id_cliente}}
+        </p>
+        {% endif %}
+
+        <!-- Form Name -->
+        <legend>Cadastro de Clientes</legend>
+        <!-- Text input-->
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="nome">Nome:</label>
+            <div class="col-md-2">
+                <input id="nome" name="nome" type="text" placeholder="" class="form-control input-md" value="{{nome}}">
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="telefone">Telefone:</label>
+            <div class="col-md-2">
+                <input id="telefone" name="telefone" type="text" placeholder="" class="form-control input-md" value="{{telefone}}">
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="endereco">Endereço:</label>
+            <div class="col-md-2">
+                <input id="endereco" name="endereco" type="text" placeholder="" class="form-control input-md" value="{{endereco}}">
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="sexo">Sexo</label>
+            <input type="radio" id="sexo_masc" name="sexo" value="M" {% if sexo=='M' %}checked="checked" {% endif %}>Masculino</input>
+            <input type="radio" id="sexo_fem" name="sexo" value="F" {% if sexo=='F' %}checked="checked" {% endif %}>Feminino</input>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="btnsalvar"></label>
+            <div class="col-md-8">
+                <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
+                <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</body>
+
+</html>

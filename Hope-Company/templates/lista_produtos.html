@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Produtos</title>
+        <link rel="stylesheet" type="text/css" href="/static/clientes.css"></link>
+    </head>
+    <body>
+        <h1>Pedidos:</h1>
+        <table>
+            <tr>
+                <td>ID</td>
+                <td>Descrição</td>
+                <td>Nome do cliente</td>
+                <td>Sexo do cliente</td>
+                <td>&nbsp;</td>
+            </tr>
+            {% for produto in produtos %}
+                <tr>
+                    <td>{{produto['id_produto']}}</td>
+                    <td>{{produto['descricao']}}</td>
+                    <td>{{produto['nome']}}</td>
+                    <td>{% if produto['sexo'] == 'M' %}Masculino{% else %}Feminino{% endif %}</td>
+                    <td><a href="/produto/{{produto['id_produto']}}" class="botao">Editar</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        <p><a href="/menu" class="botao">Voltar</a></p>
+    </body>
+</html>
