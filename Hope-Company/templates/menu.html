@@ -1,33 +1,36 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="/static/format.css"></link>
 
-    </head>
-    <body>
-        {% if mensagem != '' %}
-            <h2>{{mensagem}}</h2>
-        {% endif %}
-        <nav class="menum navbar navbar-light navbar-expand-md justify-content-center fixed-top">
-            <div class="container">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/format.css"></link>
+
+</head>
+
+<body>
+    {% if mensagem != '' %}
+    <h2>{{mensagem}}</h2>
+    {% endif %}
+    <nav class="menum navbar navbar-light navbar-expand-md justify-content-center fixed-top">
+        <div class="container">
 
             <div class="navbar-collapse collapse justify-content-between align-items-center w-100" id="collapsingNavbar2">
-              <ul class="topBotomBordersOut navbar-nav mx-auto text-center">
-                <li class="nav-item active">
-                  <a class="nav-link" href="/menu">Home</a>
-                </li>
-                <li class="nav-item"><a class="nav-link" href="/cliente">Clientes</a></li>
-                <li class="nav-item"> <a class="nav-link" href="/produto">Produtos</a> 
-                <li class="nav-item"> <a class="nav-link" href="/cliente/novo">Cadastrar Cliente</a> 
-                <li class="nav-item"> <a class="nav-link" href="/produto/novo">Cadastrar produto</a> 
-                </li>
-              </ul>
+                <ul class="topBotomBordersOut navbar-nav mx-auto text-center">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/menu">Home</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/cliente">Clientes</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="/produto">Produtos</a>
+                        <li class="nav-item"> <a class="nav-link" href="/cliente/novo">Cadastrar Cliente</a>
+                            <li class="nav-item"> <a class="nav-link" href="/produto/novo">Cadastrar produto</a>
+                            </li>
+                </ul>
             </div>
-            </div>   
-          </nav>
-    </body>
+        </div>
+    </nav>
+</body>
+
 </html>
