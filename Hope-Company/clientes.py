@@ -22,7 +22,7 @@ def listar_clientes_api():
 
 @app.route("/cliente/novo/", methods = ["GET"])
 def form_criar_cliente_api():
-    return render_template("form_cliente.html", id_cliente = "novo", nome = "", sexo = "", telefone = "", endereco = "")
+    return render_template("form_cliente.html", id_cliente = "novo", nome = "", sexo = "", telefone = "", endereco = "", email = "")
 
 @app.route("/cliente/novo/", methods = ["POST"])
 def criar_cliente_api():
@@ -30,7 +30,8 @@ def criar_cliente_api():
     sexo = request.form["sexo"]
     telefone = request.form["telefone"]
     endereco = request.form["endereco"]
-    id_cliente = criar_cliente(nome, sexo, telefone, endereco)
+    email = request.form["email"]
+    id_cliente = criar_cliente(nome, sexo, telefone, endereco, email)
     return render_template("menu.html", mensagem = f"{'O' if sexo == 'M' else 'A'} cliente {nome} foi criad{'o' if sexo == 'M' else 'a'} com o id {id_cliente}.")
 
 @app.route("/cliente/<int:id_cliente>", methods = ["GET"])
@@ -39,7 +40,7 @@ def form_alterar_cliente_api(id_cliente):
         id_cliente)
     if cliente == None:
         return render_template("menu.html", mensagem = f"Esse cliente não existe."), 404
-    return render_template("form_cliente.html", id_cliente = id_cliente, nome = cliente['nome'], sexo = cliente['sexo'], telefone = cliente['telefone'], endereco = cliente['endereco'])
+    return render_template("form_cliente.html", id_cliente = id_cliente, nome = cliente['nome'], sexo = cliente['sexo'], telefone = cliente['telefone'], endereco = cliente['endereco'], email = cliente['email'])
 
 @app.route("/cliente/<int:id_cliente>", methods = ["POST"])
 def alterar_cliente_api(id_cliente):
@@ -47,10 +48,11 @@ def alterar_cliente_api(id_cliente):
     sexo = request.form["sexo"]
     telefone = request.form["telefone"]
     endereco = request.form["endereco"]
+    email = request.form["email"]
     cliente = consultar_cliente(id_cliente)
     if cliente == None:
         return render_template("menu.html", mensagem = f"Esse cliente nem mesmo existia mais."), 404
-    editar_cliente(id_cliente, nome, sexo, telefone, endereco)
+    editar_cliente(id_cliente, nome, sexo, telefone, endereco, email)
     return render_template("menu.html", mensagem = f"{'O' if sexo == 'M' else 'A'} cliente {nome} com o id {id_cliente} foi editad{'o' if sexo == 'M' else 'a'}.")
 
 @app.route("/produto/")
@@ -123,7 +125,8 @@ CREATE TABLE cliente (
     nome VARCHAR(50) NOT NULL,
     sexo VARCHAR(1) NOT NULL,
     telefone CHAR(11) NULL,
-    endereco CHAR(100) NULL
+    endereco CHAR(100) NULL,
+    email CHAR(100) NULL
 );
 
 CREATE TABLE produto (
@@ -146,18 +149,18 @@ def criar_bd():
 
 def listar_clientes():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_cliente, nome, sexo, telefone, endereco FROM cliente ORDER BY id_cliente")
+        cur.execute("SELECT id_cliente, nome, sexo, telefone, endereco, email FROM cliente ORDER BY id_cliente")
         return rows_to_dict(cur.description, cur.fetchall())
 
 def listar_clientes_ordem():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_cliente, nome, sexo, telefone, endereco FROM cliente ORDER BY nome")
+        cur.execute("SELECT id_cliente, nome, sexo, telefone, endereco, email FROM cliente ORDER BY nome")
         return rows_to_dict(cur.description, cur.fetchall())
 
 
 def consultar_cliente(id_cliente):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_cliente, nome, sexo, telefone, endereco FROM cliente WHERE id_cliente = ?", (id_cliente, ))
+        cur.execute("SELECT id_cliente, nome, sexo, telefone, endereco, email FROM cliente WHERE id_cliente = ?", (id_cliente, ))
         return row_to_dict(cur.description, cur.fetchone())
 
 def consultar_produto(id_produto):
@@ -171,9 +174,9 @@ def listar_produtos():
         return rows_to_dict(cur.description, cur.fetchall())
         
 
-def criar_cliente(nome, sexo, telefone, endereco):
+def criar_cliente(nome, sexo, telefone, endereco, email):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO cliente (nome, sexo, telefone, endereco) VALUES (?, ?, ?, ?)", (nome, sexo, telefone, endereco))
+        cur.execute("INSERT INTO cliente (nome, sexo, telefone, endereco, email) VALUES (?, ?, ?, ?, ?)", (nome, sexo, telefone, endereco, email))
         id_cliente = cur.lastrowid
         con.commit()
         return id_cliente
@@ -185,9 +188,9 @@ def criar_produto(descricao, id_cliente):
         con.commit()
         return id_produto
 
-def editar_cliente(id_cliente, nome, sexo, telefone, endereco):
+def editar_cliente(id_cliente, nome, sexo, telefone, endereco, email):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE cliente SET nome = ?, sexo = ?, telefone = ?, endereco = ? WHERE id_cliente = ?", (nome, sexo, telefone, endereco, id_cliente))
+        cur.execute("UPDATE cliente SET nome = ?, sexo = ?, telefone = ?, endereco = ?, email = ? WHERE id_cliente = ?", (nome, sexo, telefone, endereco, email, id_cliente))
         con.commit()
 
 def editar_produto(id_produto, descricao, id_cliente):
@@ -206,4 +209,5 @@ def deletar_produto(id_produto):
 ########################
 
 if __name__ == "__main__":
+    criar_bd()
     app.run()

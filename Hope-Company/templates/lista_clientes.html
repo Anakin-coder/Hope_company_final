@@ -20,6 +20,7 @@
                 <th>Telefone</th>
                 <th>Endereço</th>
                 <th>Sexo</th>
+                <th>Email</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
@@ -31,6 +32,7 @@
                 <td>{{cliente['nome']}}</td>
                 <td>{{cliente['telefone']}}</td>
                 <td>{{cliente['endereco']}}</td>
+                <td>{{cliente['email']}}</td>
                 <td>{% if cliente['sexo'] == 'M' %}Masculino{% else %}Feminino{% endif %}</td>
                 <td><a href="/cliente/{{cliente['id_cliente']}}" class="botao">Editar</a></td>
             </tr>
