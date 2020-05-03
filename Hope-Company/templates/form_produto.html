@@ -19,11 +19,12 @@
                 return false;
             }
             try {
-                if (parseFloat(preco.value) < 0) {
+                const p = parseInt(preco)
+                if (p.value < 0) {
                     alert("Preencha o preço.");
                     return false;
                 }
-            } 
+            }
             catch (error) {
                 alert("Preencha o preço.");
                 return false;
@@ -106,10 +107,17 @@
             <div class="col-md-8">
                 <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary"
                     onclick="salvar()">Salvar</button>
+                {% if id_produto != 'novo' %}
+                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="javascript:excluir();">Excluir</button>
+                 {% endif %}
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
+
             </div>
         </div>
-
     </form>
+    {% if id_produto != 'novo' %}
+    <form action="/produto/{{id_produto}}" id="delt" method="DELETE" style="display: none"></form>
+    {% endif %}
+</body>
 
 </html>
