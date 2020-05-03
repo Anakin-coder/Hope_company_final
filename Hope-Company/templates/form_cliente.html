@@ -19,24 +19,24 @@
             const endereco = document.getElementById('endereco');
             const email = document.getElementById('email');
 
-            if (nome.value === '') {
-                alert("Preencha o nome.");
+            if (nome.value.length < 5) {
+                alert("Preencha o nome corretamente.");
                 return false;
             }
             if (!sexo_masc.checked && !sexo_fem.checked) {
                 alert("Escolha o sexo.");
                 return false;
             }
-            if (telefone.value === '') {
-                alert("Preencha o telefone.");
+            if (!telefone.value.match('^(?:\([1-9]{2}\)|[1-9]{2}) ?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$')) {
+                alert("Este número de telefone não é válido.");
                 return false;
             }
             if (endereco.value === '') {
                 alert("Preencha o endereço.");
                 return false;
             }
-            if (email.value === '') {
-                alert("Preencha o e-mail");
+            if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
+                alert("Preencha o e-mail corretamente");
                 return false;
             }
             return true;
@@ -103,7 +103,7 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
             </div>
         </div>

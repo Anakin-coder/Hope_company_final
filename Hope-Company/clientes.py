@@ -93,6 +93,7 @@ def form_alterar_produto_api(id_produto):
 @app.route("/produto/<int:id_produto>/", methods = ["POST"])
 def alterar_produto_api(id_produto):
     descricao = request.form["descricao"]
+<<<<<<< HEAD
     quantidade = request.form["quantidade"]
     preco = request.form["preco"]
     cores = request.form["cores"]
@@ -101,6 +102,12 @@ def alterar_produto_api(id_produto):
         return render_template("menu.html", mensagem = f"Esse produto não existe."), 404
     editar_produto(id_produto, descricao, quantidade, preco, cores)
     return render_template("menu.html", mensagem = f"O produto {id_produto} foi editado com sucesso!")
+=======
+    produto = consultar_produto(id_produto)
+    if produto == None:
+        return render_template("menu.html", mensagem = f"Esse produto nem mesmo existia mais."), 404
+    return render_template("menu.html", mensagem = f"O produto {descricao} com o id {id_produto} foi editado.")
+>>>>>>> 2441006e0be73b982a76bb253ca5f955a7424787
 
 @app.route("/produto/<int:id_produto>/", methods = ["DELETE"])
 def deletar_produto_api(id_produto):
@@ -154,6 +161,21 @@ CREATE TABLE IF NOT EXISTS produto (
     preco REAL,
     cores VARCHAR(50) NULL
 
+);
+CREATE TABLE IF NOT EXISTS pedido (
+    id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_cliente INTEGER NOT NULL,
+    datahora DATETIME NOT NULL,
+    pago TINYINT(1),
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+);
+CREATE TABLE IF NOT EXISTS produto_pedido (
+    id_produto INTEGER PRIMARY KEY,
+    id_pedido INTEGER,
+    preco_unitario REAL NOT NULL,
+    quantidade INTEGER NOT NULL,
+    FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
+    FOREIGN KEY(id_pedido) REFERENCES pedido(id_pedido)
 );
 CREATE TABLE IF NOT EXISTS pedido (
     id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -241,7 +263,11 @@ def listar_produtos():
 #        cur.execute("SELECT id_produto, descricao, quantidade, preco, cores FROM produto ORDER BY descrição")
 #        return rows_to_dict(cur.description, cur.fetchall())
 
+<<<<<<< HEAD
 def editar_produto(id_produto, descricao, quantidade, preco, cores):
+=======
+def editar_produto(id_produto, descricao, quantidade, preco):
+>>>>>>> 2441006e0be73b982a76bb253ca5f955a7424787
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("UPDATE produto SET descricao = ?, quantidade = ?, preco = ?, cores = ? WHERE id_produto = ?", (descricao, quantidade, preco, cores, id_produto))
         con.commit()

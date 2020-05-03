@@ -18,10 +18,18 @@
                 alert.apply("Preencha a descrição.");
                 return false 
             }
-            if (preco.value == "") {
+            try {
+                const p = parseInt(preco)
+                if (p.value < 0) {
+                    alert("Preencha o preço.");
+                    return false;
+                }
+            }
+            catch (error) {
                 alert("Preencha o preço.");
                 return false;
             }
+
             if (quantidade.value == "") {
                 alert("Preencha a quantidade.");
                 return false;
@@ -77,6 +85,7 @@
         </div>
 
         <div class="form-group">
+<<<<<<< HEAD
             <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
             <div class="col-md-2">
                 <input id="quantidade" name="quantidade" type="text" placeholder="" class="form-control input-md"
@@ -86,9 +95,11 @@
         </div>
 
         <div class="form-group">
+=======
+>>>>>>> 2441006e0be73b982a76bb253ca5f955a7424787
             <label class="col-md-4 control-label" for="preco">Preço</label>
             <div class="col-md-2">
-                <input id="preco" name="preco" type="text" placeholder="" class="form-control input-md"
+                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md"
                     value="{{preco}}">
 
             </div>
@@ -97,8 +108,13 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="cores">Cor</label>
             <div class="col-md-2">
+<<<<<<< HEAD
                 <input id="cores" name="cores" type="text" placeholder="" class="form-control input-md"
                     value="{{cores}}">
+=======
+                <input id="quantidade" name="quantidade" type="number" placeholder="" class="form-control input-md"
+                    value="{{quantidade}}">
+>>>>>>> 2441006e0be73b982a76bb253ca5f955a7424787
 
             </div>    
         </div>
@@ -107,11 +123,19 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary"
+                    onclick="salvar()">Salvar</button>
+                {% if id_produto != 'novo' %}
+                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="javascript:excluir();">Excluir</button>
+                 {% endif %}
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
+
             </div>
         </div>
-
     </form>
+    {% if id_produto != 'novo' %}
+    <form action="/produto/{{id_produto}}" id="delt" method="DELETE" style="display: none"></form>
+    {% endif %}
+</body>
 
 </html>
