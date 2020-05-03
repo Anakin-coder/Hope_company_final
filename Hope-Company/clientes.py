@@ -177,6 +177,7 @@ def conectar():
 
 def criar_bd():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
+        criar_bd
         cur.executescript(sql_create)
         con.commit()
 
@@ -256,5 +257,4 @@ def deletar_produto(id_produto):
 ########################
 
 if __name__ == "__main__":
-    criar_bd()
     app.run()
