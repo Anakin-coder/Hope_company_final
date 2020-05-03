@@ -4,17 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produtos</title>
+    <title>Cadastro de Produtos</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
     <script type="text/javascript">
         const id_produto = "{{id_produto}}";
 
-        function validar() {
+/*  function validar() {
             const descricao = document.getElementById('descricao');
             const preco = document.getElementById('preco');
             const quantidade = document.getElementById('quantidade');
-            const cor = document.getElementById('cor');
             if (descricao.value == "") {
                 alert.apply("Preencha a descrição.");
                 return false 
@@ -27,13 +26,9 @@
                 alert("Preencha a quantidade.");
                 return false;
             }
-            if (cor.value == "") {
-                alert ("Preencha a cor!");
-                return false;
-            }   
             return true;
         }
-
+*/
         
         function salvar() {
             if (!validar()) return;
@@ -94,16 +89,16 @@
             <label class="col-md-4 control-label" for="preco">Preço</label>
             <div class="col-md-2">
                 <input id="preco" name="preco" type="text" placeholder="" class="form-control input-md"
-                    value="{preco}">
+                    value="{{preco}}">
 
             </div>
         </div>
 
         <div class="form-group">
-            <label class="col-md-4 control-label" for="cor">Cor</label>
+            <label class="col-md-4 control-label" for="cores">Cor</label>
             <div class="col-md-2">
-                <input id="cor" name="cor" type="text" placeholder="" class="form-control input-md"
-                    value="{{cor}}">
+                <input id="cores" name="cores" type="text" placeholder="" class="form-control input-md"
+                    value="{{cores}}">
 
             </div>    
         </div>
