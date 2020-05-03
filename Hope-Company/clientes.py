@@ -31,7 +31,6 @@ def criar_cliente_api():
     telefone = request.form["telefone"]
     endereco = request.form["endereco"]
     email = request.form["email"]
-    return render_template("menu.html", mensagem = f"Erro ao cadastrar cliente")
     id_cliente = criar_cliente(nome, sexo, telefone, endereco, email)
     return render_template("menu.html", mensagem = f"{'O' if sexo == 'M' else 'A'} cliente {nome} foi criad{'o' if sexo == 'M' else 'a'} com o id {id_cliente}.")
 
@@ -79,14 +78,14 @@ def form_alterar_produto_api(id_produto):
     return render_template("form_produto.html", id_produto = id_produto, quantidade = produto['quantidade'], preco = produto['preco'], clientes = listar_clientes_ordem())
 
 @app.route("/produto/<int:id_produto>/", methods = ["POST"])
-def alterar_produto_api(id_produto):
+def alterar_produto_api(id_produto, quantidade, preco
+):
     descricao = request.form["descricao"]
     quantidade = request.form["quantidade"]
     preco = request.form["preco"]
-    produto = consultar_produto(id_produto)
+    produto = consultar_produto(id_produto, quantidade, preco)
     if produto == None:
         return render_template("menu.html", mensagem = f"Esse produto nem mesmo existia mais."), 404
-    editar_produto(id_produto, quantidade, preco)
     return render_template("menu.html", mensagem = f"O produto {descricao} com o id {id_produto} foi editado.")
 
 @app.route("/produto/<int:id_produto>/", methods = ["DELETE"])
@@ -136,6 +135,21 @@ CREATE TABLE IF NOT EXISTS produto (
     descricao VARCHAR(50) NOT NULL,
     preco REAl,
     quantidade INT
+);
+CREATE TABLE IF NOT EXISTS pedido (
+    id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_cliente INTEGER NOT NULL,
+    datahora DATETIME NOT NULL,
+    pago TINYINT(1),
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+);
+CREATE TABLE IF NOT EXISTS produto_pedido (
+    id_produto INTEGER PRIMARY KEY,
+    id_pedido INTEGER,
+    preco_unitario REAL NOT NULL,
+    quantidade INTEGER NOT NULL,
+    FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
+    FOREIGN KEY(id_pedido) REFERENCES pedido(id_pedido)
 );
 """
 
@@ -193,7 +207,7 @@ def editar_cliente(id_cliente, nome, sexo, telefone, endereco, email):
         cur.execute("UPDATE cliente SET nome = ?, sexo = ?, telefone = ?, endereco = ?, email = ? WHERE id_cliente = ?", (nome, sexo, telefone, endereco, email, id_cliente))
         con.commit()
 
-def editar_produto(id_produto, quantidade, preco):
+def editar_produto(id_produto, descricao, quantidade, preco):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("UPDATE produto SET descricao = ?, quantidade = ?, preco = ?  WHERE id_produto = ?", (descricao, quantidade, preco, id_produto))
         con.commit()
