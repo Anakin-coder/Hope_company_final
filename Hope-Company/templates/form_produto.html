@@ -18,10 +18,17 @@
                 alert("Preencha a descrição.");
                 return false;
             }
-            if (preco.value == "") {
+            try {
+                if (parseFloat(preco.value) < 0) {
+                    alert("Preencha o preço.");
+                    return false;
+                }
+            } 
+            catch (error) {
                 alert("Preencha o preço.");
                 return false;
             }
+
             if (quantidade.value == "") {
                 alert("Preencha a quantidade.");
                 return false;
@@ -97,7 +104,8 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary"
+                    onclick="salvar()">Salvar</button>
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
             </div>
         </div>
