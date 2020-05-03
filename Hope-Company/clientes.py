@@ -31,18 +31,18 @@ def criar_cliente_api():
     telefone = request.form["telefone"]
     endereco = request.form["endereco"]
     email = request.form["email"]
+    return render_template("menu.html", mensagem = f"Erro ao cadastrar cliente")
     id_cliente = criar_cliente(nome, sexo, telefone, endereco, email)
     return render_template("menu.html", mensagem = f"{'O' if sexo == 'M' else 'A'} cliente {nome} foi criad{'o' if sexo == 'M' else 'a'} com o id {id_cliente}.")
 
-@app.route("/cliente/<int:id_cliente>", methods = ["GET"])
+@app.route("/cliente/<int:id_cliente>/", methods = ["GET"])
 def form_alterar_cliente_api(id_cliente):
-    cliente = consultar_cliente(
-        id_cliente)
+    cliente = consultar_cliente(id_cliente)
     if cliente == None:
         return render_template("menu.html", mensagem = f"Esse cliente não existe."), 404
     return render_template("form_cliente.html", id_cliente = id_cliente, nome = cliente['nome'], sexo = cliente['sexo'], telefone = cliente['telefone'], endereco = cliente['endereco'], email = cliente['email'])
 
-@app.route("/cliente/<int:id_cliente>", methods = ["POST"])
+@app.route("/cliente/<int:id_cliente>/", methods = ["POST"])
 def alterar_cliente_api(id_cliente):
     nome = request.form["nome"]
     sexo = request.form["sexo"]
@@ -61,33 +61,35 @@ def listar_produtos_api():
 
 @app.route("/produto/novo/", methods = ["GET"])
 def form_criar_produto_api():
-    return render_template("form_produto.html", id_produto = "novo", descricao = "", id_cliente = "", clientes = listar_clientes_ordem())
+    return render_template("form_produto.html", id_produto = "novo", descricao = "", quantidade = "", preco = "", clientes = listar_clientes_ordem())
 
 @app.route("/produto/novo/", methods = ["POST"])
 def criar_produto_api():
     descricao = request.form["descricao"]
-    id_cliente = request.form["cliente"]
-    id_produto = criar_produto(descricao, id_cliente)
+    quantidade = request.form["quantidade"]
+    preco = request.form["preco"]
+    id_produto = criar_produto(descricao, quantidade, preco)
     return render_template("menu.html", mensagem = f"O produto {descricao} foi criado com o id {id_produto}.")
 
-@app.route("/produto/<int:id_produto>", methods = ["GET"])
+@app.route("/produto/<int:id_produto>/", methods = ["GET"])
 def form_alterar_produto_api(id_produto):
     produto = consultar_produto(id_produto)
     if produto == None:
         return render_template("menu.html", mensagem = f"Esse produto não existe."), 404
-    return render_template("form_produto.html", id_produto = id_produto, descricao = produto['descricao'], id_cliente = produto['id_cliente'], clientes = listar_clientes_ordem())
+    return render_template("form_produto.html", id_produto = id_produto, quantidade = produto['quantidade'], preco = produto['preco'], clientes = listar_clientes_ordem())
 
-@app.route("/produto/<int:id_produto>", methods = ["POST"])
+@app.route("/produto/<int:id_produto>/", methods = ["POST"])
 def alterar_produto_api(id_produto):
     descricao = request.form["descricao"]
-    id_cliente = request.form["id_cliente"]
+    quantidade = request.form["quantidade"]
+    preco = request.form["preco"]
     produto = consultar_produto(id_produto)
     if produto == None:
         return render_template("menu.html", mensagem = f"Esse produto nem mesmo existia mais."), 404
-    editar_produto(id_produto, descricao, id_cliente)
+    editar_produto(id_produto, quantidade, preco)
     return render_template("menu.html", mensagem = f"O produto {descricao} com o id {id_produto} foi editado.")
 
-@app.route("/produto/<int:id_produto>", methods = ["DELETE"])
+@app.route("/produto/<int:id_produto>/", methods = ["DELETE"])
 def deletar_produto_api(id_produto):
     produto = consultar_produto(id_produto)
     if produto == None:
@@ -120,7 +122,7 @@ def rows_to_dict(description, rows):
 ####################################
 #  IF NOT EXISTS
 sql_create = """
-CREATE TABLE cliente (
+CREATE TABLE IF NOT EXISTS cliente (
     id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
     nome VARCHAR(50) NOT NULL,
     sexo VARCHAR(1) NOT NULL,
@@ -129,13 +131,11 @@ CREATE TABLE cliente (
     email CHAR(100) NULL
 );
 
-CREATE TABLE produto (
+CREATE TABLE IF NOT EXISTS produto (
     id_produto INTEGER PRIMARY KEY AUTOINCREMENT,
     descricao VARCHAR(50) NOT NULL,
     preco REAl,
-    quantidade INT,
-    id_cliente INTEGER NOT NULL,
-    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+    quantidade INT
 );
 """
 
@@ -165,12 +165,12 @@ def consultar_cliente(id_cliente):
 
 def consultar_produto(id_produto):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT p.id_produto, p.descricao, p.id_cliente, p.quantidade, p.preco, c.nome, c.sexo FROM produto p INNER JOIN cliente c ON p.id_cliente = c.id_cliente WHERE id_produto = ?", (id_produto, ))
+        cur.execute("SELECT p.id_produto, p.descricao, p.quantidade, p.preco FROM produto p WHERE id_produto = ?", (id_produto, ))
         return row_to_dict(cur.description, cur.fetchone())
 
 def listar_produtos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT p.id_produto, p.descricao, p.id_cliente, p.quantidade, p.preco, c.nome, c.sexo FROM produto p INNER JOIN cliente c ON p.id_cliente = c.id_cliente ORDER BY p.id_produto")
+        cur.execute("SELECT p.id_produto, p.descricao, p.quantidade, p.preco FROM produto p ORDER BY p.id_produto")
         return rows_to_dict(cur.description, cur.fetchall())
         
 
@@ -181,9 +181,9 @@ def criar_cliente(nome, sexo, telefone, endereco, email):
         con.commit()
         return id_cliente
 
-def criar_produto(descricao, id_cliente):
+def criar_produto(descricao, quantidade, preco):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO produto (descricao, id_cliente) VALUES (?, ?)", (descricao, id_cliente))
+        cur.execute("INSERT INTO produto (descricao, quantidade, preco) VALUES (?, ?, ?)", (descricao, quantidade, preco))
         id_produto = cur.lastrowid
         con.commit()
         return id_produto
@@ -193,9 +193,9 @@ def editar_cliente(id_cliente, nome, sexo, telefone, endereco, email):
         cur.execute("UPDATE cliente SET nome = ?, sexo = ?, telefone = ?, endereco = ?, email = ? WHERE id_cliente = ?", (nome, sexo, telefone, endereco, email, id_cliente))
         con.commit()
 
-def editar_produto(id_produto, descricao, id_cliente):
+def editar_produto(id_produto, quantidade, preco):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE produto SET descricao = ?, id_cliente = ? WHERE id_produto = ?", (descricao, id_cliente, id_produto))
+        cur.execute("UPDATE produto SET descricao = ?, quantidade = ?, preco = ?  WHERE id_produto = ?", (descricao, quantidade, preco, id_produto))
         con.commit()
 
 def deletar_produto(id_produto):

@@ -12,13 +12,18 @@
 
         function validar() {
             const descricao = document.getElementById('descricao');
-            const cliente = document.getElementById('cliente');
-            if (descricao.value === '') {
+            const preco = document.getElementById('preco');
+            const quantidade = document.getElementById('quantidade');
+            if (descricao.value == "") {
                 alert("Preencha a descrição.");
                 return false;
             }
-            if (cliente.value == "escolha") {
-                alert("Escolha o cliente.");
+            if (preco.value == "") {
+                alert("Preencha o preço.");
+                return false;
+            }
+            if (quantidade.value == "") {
+                alert("Preencha a quantidade.");
                 return false;
             }
             return true;
@@ -34,7 +39,7 @@
             xhr = new XMLHttpRequest();
             xhr.open('DELETE', '/produto/' + id_produto);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function() {
+            xhr.onload = function () {
                 if (xhr.readyState !== 4) return;
                 if (xhr.status === 200 || xhr.status === 404) {
                     document.open();
@@ -64,31 +69,38 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="descricao">Descrição</label>
             <div class="col-md-2">
-                <input id="descricao" name="descricao" type="text" placeholder="" class="form-control input-md" value="{{descricao}}">
+                <input id="descricao" name="descricao" type="text" placeholder="" class="form-control input-md"
+                    value="{{descricao}}">
 
             </div>
         </div>
 
-        <!-- Select Basic -->
         <div class="form-group">
-            <label class="col-md-4 control-label" for="cliente">Cliente</label>
-            <div class="col-md-4">
-                <select id="id_cliente" name="cliente" class="form-control">
-              <option value="Escolha">Escolha...</option>
-              {% for cliente in clientes %}
-				<option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['nome']}}</option>
-			  {% endfor %}
-            </select>
+            <label class="col-md-4 control-label" for="preco">preco</label>
+            <div class="col-md-2">
+                <input id="preco" name="preco" type="text" placeholder="" class="form-control input-md"
+                    value="{{preco}}">
 
+            </div>
+        </div>
 
-                <!-- Button (Double) -->
-                <div class="form-group">
-                    <label class="col-md-4 control-label" for="btnsalvar"></label>
-                    <div class="col-md-8">
-                        <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
-                        <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
-                    </div>
-                </div>
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
+            <div class="col-md-2">
+                <input id="quantidade" name="quantidade" type="text" placeholder="" class="form-control input-md"
+                    value="{{quantidade}}">
+
+            </div>
+        </div>
+
+        <!-- Button (Double) -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="btnsalvar"></label>
+            <div class="col-md-8">
+                <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
+                <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
+            </div>
+        </div>
 
     </form>
 
