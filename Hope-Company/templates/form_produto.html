@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedido</title>
+    <title>Produtos</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
     <script type="text/javascript">
@@ -14,9 +14,10 @@
             const descricao = document.getElementById('descricao');
             const preco = document.getElementById('preco');
             const quantidade = document.getElementById('quantidade');
+            const cor = document.getElementById('cor');
             if (descricao.value == "") {
-                alert("Preencha a descrição.");
-                return false;
+                alert.apply("Preencha a descrição.");
+                return false 
             }
             if (preco.value == "") {
                 alert("Preencha o preço.");
@@ -26,9 +27,14 @@
                 alert("Preencha a quantidade.");
                 return false;
             }
+            if (cor.value == "") {
+                alert ("Preencha a cor!");
+                return false;
+            }   
             return true;
         }
 
+        
         function salvar() {
             if (!validar()) return;
             document.getElementById("form_principal").submit();
@@ -76,21 +82,30 @@
         </div>
 
         <div class="form-group">
-            <label class="col-md-4 control-label" for="preco">preco</label>
-            <div class="col-md-2">
-                <input id="preco" name="preco" type="text" placeholder="" class="form-control input-md"
-                    value="{{preco}}">
-
-            </div>
-        </div>
-
-        <div class="form-group">
             <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
             <div class="col-md-2">
                 <input id="quantidade" name="quantidade" type="text" placeholder="" class="form-control input-md"
                     value="{{quantidade}}">
 
             </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="preco">Preço</label>
+            <div class="col-md-2">
+                <input id="preco" name="preco" type="text" placeholder="" class="form-control input-md"
+                    value="{preco}">
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="cor">Cor</label>
+            <div class="col-md-2">
+                <input id="cor" name="cor" type="text" placeholder="" class="form-control input-md"
+                    value="{{cor}}">
+
+            </div>    
         </div>
 
         <!-- Button (Double) -->
