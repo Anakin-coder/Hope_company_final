@@ -78,12 +78,9 @@ def form_alterar_produto_api(id_produto):
     return render_template("form_produto.html", id_produto = id_produto, quantidade = produto['quantidade'], preco = produto['preco'], clientes = listar_clientes_ordem())
 
 @app.route("/produto/<int:id_produto>/", methods = ["POST"])
-def alterar_produto_api(id_produto, quantidade, preco
-):
+def alterar_produto_api(id_produto):
     descricao = request.form["descricao"]
-    quantidade = request.form["quantidade"]
-    preco = request.form["preco"]
-    produto = consultar_produto(id_produto, quantidade, preco)
+    produto = consultar_produto(id_produto)
     if produto == None:
         return render_template("menu.html", mensagem = f"Esse produto nem mesmo existia mais."), 404
     return render_template("menu.html", mensagem = f"O produto {descricao} com o id {id_produto} foi editado.")
