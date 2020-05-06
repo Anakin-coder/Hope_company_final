@@ -9,27 +9,34 @@
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
     <script type="text/javascript">
-        function validar() {
+     
+     
+     function validar() {
             const nome = document.getElementById('nome');
             const sexo_masc = document.getElementById('sexo_masc');
             const sexo_fem = document.getElementById('sexo_fem');
             const telefone = document.getElementById('telefone');
             const endereco = document.getElementById('endereco');
+            const email = document.getElementById('email');
 
-            if (nome.value === '') {
-                alert("Preencha o nome.");
+            if (nome.value.length < 5) {
+                alert("Informe o seu nome completo");
                 return false;
             }
             if (!sexo_masc.checked && !sexo_fem.checked) {
                 alert("Escolha o sexo.");
                 return false;
             }
-            if (telefone.value === '') {
-                alert("Preencha o telefone.");
+            if (!telefone.value.match('^(?:\([1-9]{2}\)|[1-9]{2}) ?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$')) {
+                alert("Este número de telefone não é válido.");
                 return false;
             }
             if (endereco.value === '') {
                 alert("Preencha o endereço.");
+                return false;
+            }
+            if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
+                alert("Preencha o e-mail corretamente");
                 return false;
             }
             return true;
@@ -71,6 +78,14 @@
         </div>
 
         <div class="form-group">
+            <label class="col-md-4 control-label" for="email">E-mail</label>
+            <div class="col-md-2">
+                <input id="email" name="email" type="text" placeholder="" class="form-control input-md" value="{{email}}">
+
+            </div>
+        </div>
+
+        <div class="form-group">
             <label class="col-md-4 control-label" for="endereco">Endereço:</label>
             <div class="col-md-2">
                 <input id="endereco" name="endereco" type="text" placeholder="" class="form-control input-md" value="{{endereco}}">
@@ -87,7 +102,7 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button>
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
             </div>
         </div>
