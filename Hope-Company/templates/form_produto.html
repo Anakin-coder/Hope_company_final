@@ -5,18 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Produtos</title>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script type="text/javascript">
         const id_produto = "{{id_produto}}";
 
-    function validar() {
+        function validar() {
             const descricao = document.getElementById('descricao');
             const preco = document.getElementById('preco');
             const quantidade = document.getElementById('quantidade');
+            const cor = document.getElementById('cores');
             if (descricao.value == "") {
                 alert("Preencha a descrição.");
-                return false 
+                return false
             }
             try {
                 const p = parseInt(preco)
@@ -24,8 +25,7 @@
                     alert("Preencha o preço.");
                     return false;
                 }
-            }
-            catch (error) {
+            } catch (error) {
                 alert("Preencha o preço.");
                 return false;
             }
@@ -35,8 +35,14 @@
                 return false;
             }
             return true;
+
+            if (cor.value == "") {
+                alert("Preencha a cor.");
+                return false;
+            }
+            return true;
         }
-        
+
         function salvar() {
             if (!validar()) return;
             document.getElementById("form_principal").submit();
@@ -47,7 +53,7 @@
             xhr = new XMLHttpRequest();
             xhr.open('DELETE', '/produto/' + id_produto);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function () {
+            xhr.onload = function() {
                 if (xhr.readyState !== 4) return;
                 if (xhr.status === 200 || xhr.status === 404) {
                     document.open();
@@ -77,8 +83,7 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="descricao">Descrição</label>
             <div class="col-md-2">
-                <input id="descricao" name="descricao" type="text" placeholder="" class="form-control input-md"
-                    value="{{descricao}}">
+                <input id="descricao" name="descricao" type="text" placeholder="" class="form-control input-md" value="{{descricao}}">
 
             </div>
         </div>
@@ -86,8 +91,7 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
             <div class="col-md-2">
-                <input id="quantidade" name="quantidade" type="text" placeholder="" class="form-control input-md"
-                    value="{{quantidade}}">
+                <input id="quantidade" name="quantidade" type="text" placeholder="" class="form-control input-md" value="{{quantidade}}">
 
             </div>
         </div>
@@ -95,8 +99,7 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="preco">Preço</label>
             <div class="col-md-2">
-                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md"
-                    value="{{preco}}">
+                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md" value="{{preco}}">
 
             </div>
         </div>
@@ -104,21 +107,17 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="cores">Cor</label>
             <div class="col-md-2">
-                <input id="cores" name="cores" type="text" placeholder="" class="form-control input-md"
-                    value="{{cores}}">
+                <input id="cores" name="cores" type="text" placeholder="" class="form-control input-md" value="{{cores}}">
 
-            </div>    
+            </div>
         </div>
 
         <!-- Button (Double) -->
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary"
-                    onclick="salvar()">Salvar</button>
-                {% if id_produto != 'novo' %}
-                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="javascript:excluir();">Excluir</button>
-                 {% endif %}
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> {% if id_produto != 'novo' %}
+                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="javascript:excluir();">Excluir</button> {% endif %}
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
 
             </div>

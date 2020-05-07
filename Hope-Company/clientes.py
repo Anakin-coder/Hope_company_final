@@ -36,13 +36,15 @@ def criar_cliente_api():
     sexo = request.form["sexo"]
     telefone = request.form["telefone"]
     endereco = request.form["endereco"]
-    endereco = request.form["email"]
+    email = request.form["email"]
     id_cliente = criar_cliente(nome, sexo, telefone, endereco, email)
     return render_template("menu.html", mensagem = f"{'O' if sexo == 'M' else 'A'} cliente {nome} foi criad{'o' if sexo == 'M' else 'a'} com o id {id_cliente}.")
 
 @app.route("/cliente/<int:id_cliente>/", methods = ["GET"])
 def form_alterar_cliente_api(id_cliente):
     cliente = consultar_cliente(id_cliente)
+    if cliente == None:
+        return render_template("menu.html", mensagem = f"Esse cliente não existe."), 404
     return render_template("form_cliente.html", id_cliente = id_cliente, nome = cliente['nome'], sexo = cliente['sexo'], telefone = cliente['telefone'], endereco = cliente['endereco'], email = cliente['email'])
 
 @app.route("/cliente/<int:id_cliente>/", methods = ["POST"])
@@ -103,7 +105,7 @@ def deletar_produto_api(id_produto):
     if produto == None:
         return render_template("menu.html", mensagem = "Esse produto nem mesmo existia mais."), 404
     deletar_produto(id_produto)
-    return render_template("menu.html", mensagem = f"O produto {id_produto} foi excluído com sucesso!")
+    return render_template("menu.html", mensagem = f"O produto {produto['descricao']} com o id {id_produto} foi excluído.")
 
 
 #_______PEDIDO________#
@@ -115,38 +117,14 @@ def listar_pedidos_api():
 
 @app.route("/pedido/novo/", methods = ["GET"])
 def form_criar_pedido_api():
-    return render_template("form_pedidos.html", id_pedido = "novo", id_cliente = "", cpf_cliente = "", descricao = "",  quantidade = "", cores = "", datahora = "", status = "")
+    return render_template("form_pedido.html", id_pedido = "novo",  datahora = "", status = "")
 
 @app.route("/pedido/novo/", methods = ["POST"])
 def criar_pedido_api():
-    cpf_cliente = request.form["cpf"]
-    descricao = request.form["descricao"]
-    quantidade = request.form["quantidade"]
-    cores = request.form["cores"]
     datahora = request.form["datahora"]
     status = request.form["status"]
-    id_pedido = criar_pedido(cpf_cliente, descricao, quantidade, cores, datahora, status)
+    id_pedido = criar_pedido(datahora, status)
     return render_template("menu.html", mensagem = f"Novo pedido gerado: {id_pedido}!")
-
-@app.route("/pedido/<int:id_pedido>/", methods = ["GET"])
-def form_alterar_pedido_api(id_pedido):
-    pedido = consultar_pedido(id_pedido)
-    if pedido == None:
-        return render_template("menu.html", mensagem = f"Esse pedido não existe."), 404
-    return render_template("form_pedido.html", id_pedido = id_pedido, cpf_cliente = pedido['cpf_cliente'], descricao = pedido['descricao'], quantidade = pedido['quantidade'], cores = pedido['preco'], datahora = pedido['datahora'], status = pedido['status'])
-
-@app.route("/pedido/<int:id_pedido>/", methods = ["POST"])
-def alterar_pedido_api(id_pedido):
-    #cpf_cliente = request.form["cpf"]
-    descricao = request.form["descricao"]
-    quantidade = request.form["quantidade"]
-    cores = request.form["cores"]
-    status = request.form["status"]
-    pedido = consultar_pedido(id_pedido)
-    if pedido == None:
-        return render_template("menu.html", mensagem = f"Esse pedido não existe."), 404
-    editar_pedido(id_pedido, descricao, quantidade, cores, status)
-    return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi editado com sucesso!")
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["DELETE"])
 def deletar_pedido_api(id_pedido):
@@ -201,19 +179,15 @@ CREATE TABLE IF NOT EXISTS produto (
 
 CREATE TABLE IF NOT EXISTS pedido (
     id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_cliente INTEGER NOT NULL,
-    datahora DATETIME NOT NULL,
-    pago TINYINT(1),
-    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
-);
-
-CREATE TABLE IF NOT EXISTS produto_pedido (
-    id_produto INTEGER PRIMARY KEY,
-    id_pedido INTEGER,
+    id_produto INTEGER NOT NULL,
+    id_cliente INTEGER NOT NULL
     preco_unitario REAL NOT NULL,
     quantidade INTEGER NOT NULL,
+    cores VARCHAR2(100),
+    datahora DATETIME NOT NULL,
+    status TINYINT(1),
     FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
-    FOREIGN KEY(id_pedido) REFERENCES pedido(id_pedido)
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
 );
 """
 
@@ -261,7 +235,8 @@ def criar_produto(descricao, quantidade, cores, preco):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("INSERT INTO produto (descricao, quantidade, cores, preco) values(?, ?, ?, ?)", (descricao, quantidade, cores, preco))
         id_produto = cur.lastrowid
-        return row_to_dict(cur.description, cur.fetchone())
+        con.commit()
+        return id_produto
 
 def consultar_produto(id_produto):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
@@ -285,9 +260,9 @@ def deletar_produto(id_produto):
 
 #_________PEDIDOS__________#
 
-def criar_pedido(id_cliente, datahora, status):
+def criar_pedido(datahora, status):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO pedido (p.id_cliente, p.datahora, p.status) VALUES (?, ?, ?) WHERE p.id_cliente = ?", (datahora, status, id_cliente))
+        cur.execute("INSERT INTO pedido (p.datahora, p.status) VALUES (?, ?, ?) WHERE p.id_cliente = ?", (datahora, status))
         id_pedido = cur.lastrowid
         con.commit()
         return id_pedido
@@ -299,7 +274,7 @@ def consultar_pedido(id_pedido):
 
 def listar_pedidos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT p.id_cliente, p.id_pedido, p.datahora, p.status FROM pedido ORDER BY p.id_pedido")
+        cur.execute("SELECT p.id_pedido, p.datahora, p.status FROM pedido ORDER BY p.id_pedido")
         return rows_to_dict(cur.description, cur.fetchall())    
 
 def deletar_pedido(id_pedido):
@@ -307,12 +282,10 @@ def deletar_pedido(id_pedido):
         cur.execute("DELETE FROM pedido WHERE id_pedido = ?", (id_pedido, ))
         con.commit()
 
-#_________PRODUTO PEDIDO__________#
-
-
 ########################
 #### Inicialização. ####
 ########################
 
 if __name__ == "__main__":
-    criar_cliente()
+    criar_bd()
+    app.run()
