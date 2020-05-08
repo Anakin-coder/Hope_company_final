@@ -77,6 +77,18 @@
         </div>
 
         <div class="form-group">
+            <label class="col-md-4 control-label" for="produto">Produto</label>
+            <div class="col-md-2">
+                <select name="id_produto" id="produto">
+                <option value="escolha">Escolha...</option>
+                    {% for prdotuo in produtos %}
+                        <option value="{{Produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['descricao']}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label class="col-md-4 control-label" for="preco">Data</label>
             <div class="col-md-2">
                 <input id="datahora" name="datahora" type="datetime" placeholder="" class="form-control input-md" value="{{datahora}}">
