@@ -110,20 +110,22 @@ def deletar_produto_api(id_produto):
 
 #_______PEDIDO________#
 
-
 @app.route("/pedido/")
 def listar_pedidos_api():
     return render_template("lista_pedidos.html", pedidos = listar_pedidos())
 
 @app.route("/pedido/novo/", methods = ["GET"])
 def form_criar_pedido_api():
-    return render_template("form_pedido.html", id_pedido = "novo",  datahora = "", status = "")
+    return render_template("form_pedido.html", id_pedido = "novo", quantidade = "", status = "", preco = "", clientes = listar_clientes(), produtos = listar_produtos())
 
 @app.route("/pedido/novo/", methods = ["POST"])
 def criar_pedido_api():
-    datahora = request.form["datahora"]
+    quantidade = request.form["quantidade"]
     status = request.form["status"]
-    id_pedido = criar_pedido(datahora, status)
+    preco = request.form["preco"]
+    id_cliente = request.form["id_cliente"]
+    id_produto = request.form["id_produto"]
+    id_pedido = criar_pedido(quantidade, status, preco, id_cliente, id_produto)
     return render_template("menu.html", mensagem = f"Novo pedido gerado: {id_pedido}!")
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["DELETE"])
@@ -183,7 +185,6 @@ CREATE TABLE IF NOT EXISTS pedido (
     id_cliente INTEGER NOT NULL,
     preco REAL NOT NULL,
     quantidade INTEGER NOT NULL,
-    cores VARCHAR2(100),
     datahora DATETIME DEFAULT CURRENT_DATE,
     status TINYINT(1),
     FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
@@ -260,32 +261,33 @@ def deletar_produto(id_produto):
 
 #_________PEDIDOS__________#
 
-def criar_pedido(p.id_cliente, datahora, status):
+def criar_pedido(quantidade, status, preco, id_cliente, id_produto): 
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO pedido (quantidade, p.status) VALUES (?, ?) WHERE p.id_cliente = ?", (datahora, status, id_cliente))
+        cur.execute("INSERT INTO pedido (quantidade, status, preco, id_cliente, id_produto) VALUES (?, ?, ?, ?, ?)", (quantidade, status, preco, id_cliente, id_produto))
         id_pedido = cur.lastrowid
         con.commit()
         return id_pedido
 
 def consultar_pedido(id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, cores, datahora, status FROM pedido p WHERE p.id_pedido  = ?", (id_pedido, ))
+        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, datahora, status FROM pedido p, clientes c WHERE p.id_cliente = c.id_cliente AND p.id_pedido  = ?", (id_pedido, ))
         return row_to_dict(cur.description, cur.fetchone())
 
 def listar_pedidos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, cores, datahora, status FROM pedido ORDER BY p.id_pedido")
+        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, datahora, status FROM pedido p ORDER BY p.id_pedido")
         return rows_to_dict(cur.description, cur.fetchall())
 
-def editar_pedido(id_pedido, quantidade, preco):
+def editar_pedido(id_pedido, preco, quantidade, datahora, status):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE produto SET quantidade = ?, preco = ? WHERE id_pedido = ?", (quantidade, preco, id_pedido))
+        cur.execute("UPDATE produto SET preco = ?, quantidade = ?, datahora= ?, status = ?, WHERE id_pedido = ?", (preco, quantidade, datahora, status, id_pedido))
         con.commit()    
 
 def deletar_pedido(id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("DELETE FROM pedido WHERE id_pedido = ?", (id_pedido, ))
         con.commit()
+
 
 ########################
 #### Inicialização. ####
@@ -294,3 +296,4 @@ def deletar_pedido(id_pedido):
 if __name__ == "__main__":
     criar_bd()
     app.run()
+    
