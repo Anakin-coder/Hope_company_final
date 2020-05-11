@@ -9,7 +9,7 @@
 }
 
 tbody {
-    display: block;
+    display: inline-block;
     height: 200px;
     overflow: auto;
 }

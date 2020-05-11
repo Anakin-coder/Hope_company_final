@@ -27,13 +27,13 @@
                 return false;
             }
 
-            if (preco.value == "") {
-                alert("Informe o preço!");
+            if (preco.value == "" || preco.value < 0) {
+                alert("Preço incorreto!");
                 return false;
             }
 
-            if (quantidade.value == "") {
-                alert("Informe o quantidade!");
+            if (quantidade.value == "" || quantidade.value < 0) {
+                alert("Quantidade incorreta!");
                 return false;
             }
 
@@ -82,20 +82,21 @@
         <legend>Cadastro de Pedidos</legend>
         <!-- Text input-->
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_cliente">Cliente:</label>
-            <select name="id_cliente" id="id_cliente">
+            <label class="col-md-4 control-label" for="id_cliente">Id_Cliente:</label>
+            <div class="col-md-2">
+                <select class="form-control" name="id_cliente" id="id_cliente">
                 <option value="escolha">Escolha...</option>
                 {% for cliente in clientes %}
                     <option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['id_cliente']}}</option>
                 {% endfor %}
             </select>
-        </div>
+            </div>
         </div>
 
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_produto">Produto</label>
+            <label class="col-md-4 control-label" for="id_produto">Id_Produto</label>
             <div class="col-md-2">
-                <select name="id_produto" id="id_produto">
+                <select class="form-control" name="id_produto" id="id_produto">
                 <option value="escolha">Escolha...</option>
                     {% for produto in produtos %}
                         <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['id_produto']}}</option>
