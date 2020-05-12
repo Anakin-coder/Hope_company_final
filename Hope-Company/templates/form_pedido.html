@@ -12,20 +12,8 @@
         const id_pedido = "{{id_pedido}}";
 
         function validar() {
-            const id_cliente = document.getElementById('id_cliente');
-            const id_produto = document.getElementById('id_produto')
             const preco = document.getElementById('preco')
             const quantidade = document.getElementById('quantidade')
-
-            if (id_produto.value == "") {
-                alert("Informe o produto!");
-                return false;
-            }
-
-            if (id_cliente.value == "") {
-                alert("Informe a nome!");
-                return false;
-            }
 
             if (preco.value == "" || preco.value < 0) {
                 alert("Preço incorreto!");
@@ -72,7 +60,7 @@
 
 <body>
 
-    <form class="form-horizontal" method="POST" action="{{ url_for('criar_pedido_api') }}" id="form_principal">
+    <form class="form-horizontal" method="POST" action="/pedido/{{id_pedido}}/" id="form_principal">
         {% if id_pedido != 'novo'%}
         <p>
             <label>Numero do Pedido:</label> {{id_pedido}}
@@ -81,23 +69,23 @@
         <!-- Form Name -->
         <legend>Cadastro de Pedidos</legend>
         <!-- Text input-->
+        {% if id_pedido == 'novo' %}
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_cliente">Id_Cliente:</label>
+            <label class="col-md-4 control-label" for="id_cliente">Cliente:</label>
             <div class="col-md-2">
                 <select class="form-control" name="id_cliente" id="id_cliente">
-                <option value="escolha">Escolha...</option>
-                {% for cliente in clientes %}
+                {% for cliente in clientes %}                    
                     <option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['id_cliente']}}</option>
                 {% endfor %}
             </select>
             </div>
         </div>
+        {% endif %}
 
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_produto">Id_Produto</label>
+            <label class="col-md-4 control-label" for="id_produto">Produto</label>
             <div class="col-md-2">
                 <select class="form-control" name="id_produto" id="id_produto">
-                <option value="escolha">Escolha...</option>
                     {% for produto in produtos %}
                         <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['id_produto']}}</option>
                     {% endfor %}
@@ -126,14 +114,19 @@
             <label class="col-md-4 control-label" for="status">Status</label>
             <input type="radio" id="status" name="status" value="Ok" {% if status=='Ok' %}checked="checked" {% endif %}>Pedido Pago</input>
             <input type="radio" id="status" name="status" value="Pendente" {% if sexo=='Pendente' %}checked="checked" {% endif %}>Pedido Pendente</input>
+            {% if id_pedido != 'novo' %}
+            <input type="radio" id="status" name="status" value="Finalizado" {% if status=='Ok' %}checked="checked" {% endif %}>Pedido Finalizado</input>
+            {% endif %}
         </div>
 
         <!-- Button (Double) -->
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> {% if id_pedido != 'novo' %}
-                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="excluir()">Excluir</button> {% endif %}
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                {% if id_pedido != 'novo' %}
+                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="excluir()">Excluir</button>
+                {% endif %}
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
 
             </div>

@@ -8,8 +8,7 @@
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script type="text/javascript">
-        const id_produto = "{{id_produto}}";
-
+       
         function validar() {
             const descricao = document.getElementById('descricao');
             const preco = document.getElementById('preco');
@@ -102,8 +101,8 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> {% if id_produto != 'novo' %}
-                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="javascript:excluir();">Excluir</button> {% endif %}
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                {% if id_produto != 'novo' %}<button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="javascript:excluir();">Excluir</button> {% endif %}
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
 
             </div>
