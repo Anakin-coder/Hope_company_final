@@ -72,7 +72,7 @@
 
 <body>
 
-    <form class="form-horizontal" action="/pedido/{{id_pedido}}/" method="POST" id="form_principal">
+    <form class="form-horizontal" method="POST" action="{{ url_for('criar_pedido_api') }}" id="form_principal">
         {% if id_pedido != 'novo'%}
         <p>
             <label>Numero do Pedido:</label> {{id_pedido}}
@@ -133,7 +133,7 @@
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
                 <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> {% if id_pedido != 'novo' %}
-                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="javascript:excluir();">Excluir</button> {% endif %}
+                <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="excluir()">Excluir</button> {% endif %}
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
 
             </div>

@@ -5,10 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todos os Pedidos</title>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/table.css"></link>
 </head>
 
 <body>
@@ -35,6 +32,7 @@
                     <td>{{pedido['quantidade']}}</td>
                     <td>{{pedido['datahora']}}</td>
                     <td>{{pedido['status']}}</td>
+                    <td><a href="/pedido/{{pedido['id_pedido']}}" class="botao">Editar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

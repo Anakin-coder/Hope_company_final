@@ -14,7 +14,6 @@
             const descricao = document.getElementById('descricao');
             const preco = document.getElementById('preco');
             const quantidade = document.getElementById('quantidade');
-            const cor = document.getElementById('cores');
             if (descricao.value == "") {
                 alert("Preencha a descrição.");
                 return false
@@ -32,12 +31,6 @@
 
             if (quantidade.value == "") {
                 alert("Preencha a quantidade.");
-                return false;
-            }
-            return true;
-
-            if (cor.value == "") {
-                alert("Preencha a cor.");
                 return false;
             }
             return true;
@@ -104,13 +97,6 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="cores">Cor</label>
-            <div class="col-md-2">
-                <input id="cores" name="cores" type="text" placeholder="" class="form-control input-md" value="{{cores}}">
-
-            </div>
-        </div>
 
         <!-- Button (Double) -->
         <div class="form-group">
