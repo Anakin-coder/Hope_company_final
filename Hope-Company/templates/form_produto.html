@@ -11,7 +11,7 @@
        
         function validar() {
             const descricao = document.getElementById('descricao');
-            const preco = document.getElementById('preco');
+            const preco_unitario = document.getElementById('preco_unitario');
             const quantidade = document.getElementById('quantidade');
             if (descricao.value == "") {
                 alert("Preencha a descrição.");
@@ -19,7 +19,7 @@
             }
             try {
                 const p = parseInt(preco)
-                if (p.value < 0) {
+                if (p.value < 0 || p.value == "") {
                     alert("Preencha o preço.");
                     return false;
                 }

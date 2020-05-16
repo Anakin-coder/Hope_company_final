@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template
+from werkzeug.security import generate_password_hash, check_password_hash
 from contextlib import closing
 import sqlite3
 
@@ -8,20 +9,44 @@ import sqlite3
 
 app = Flask(__name__)
 
+#---------------------------------LOGIN-----------------------------------------------#
 
-#_______LOGIN________#
-
-@app.route("/")
+@app.route("/", methods = ["GET"])
 def login():
-    return render_template("login.html", mensagem = "")
+    return render_template("login.html", usuario = "", senha = "")
 
+@app.route("/", methods = ["POST"])
+def login_api():
+    usuario = request.form["usuario"]
+    senha = request.form["senha"]
+    user = consultar_usuario(usuario, senha)
+    '''hash_senha = nova_senha(senha)'''
+    '''if verificasenha(hash_senha, senha) is True:'''
+    if len(user) == 0:
+        return render_template("login.html", mensagem = "Usuario ou senha incorretos tente novamente")
+    return render_template("menu.html", mensagem = f"Bem vindo, {usuario}")
+    
+#---------------------------------CADASTRO DE NOVO USUARIO-----------------------------------------------#
+
+@app.route("/registrar/novo/", methods = ["GET"])
+def registrar_novo_usu():
+    return render_template("form_registrar_usu.html", id_usuario = "novo", email = "", usuario = "", senha = "")
+
+@app.route("/registrar/<novo>/", methods = ["POST"])
+def criar_usuario():
+    email = request.form["email"]
+    usuario = request.form["usuario"]
+    senha = request.form["senha"]
+    '''hash_senha = nova_senha(senha)'''
+    inserir_novo_usuario(email, usuario, senha)
+    return render_template("menu.html", mensagem = "Cadastro efetuado com sucesso")
+   
+#---------------------------------MENU-----------------------------------------------#
 @app.route("/menu/")
 def menu():
     return render_template("menu.html", mensagem = "")
 
-
-#_______CLIENTES________#
-
+#---------------------------------CLIENTES-----------------------------------------------#
 @app.route("/cliente/")
 def listar_clientes_api():
     return render_template("lista_clientes.html", clientes = listar_clientes())
@@ -201,10 +226,16 @@ CREATE TABLE IF NOT EXISTS pedido (
     id_cliente INTEGER NOT NULL,
     preco REAL NOT NULL,
     quantidade INTEGER NOT NULL,
-    datahora DATETIME DEFAULT CURRENT_DATE,
+    datahora DATETIME DEFAULT CURRENT_TIME,
     status TINYINT(1),
     FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
     FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+);
+CREATE TABLE IF NOT EXISTS usuario (
+    id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
+    email VARCHAR(50),
+    usuario VARCHAR(50),
+    senha
 );
 """
 
@@ -291,7 +322,7 @@ def consultar_pedido(id_pedido):
 
 def listar_pedidos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, datahora, status FROM pedido p ORDER BY p.id_pedido")
+        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, datahora, status FROM pedido p ORDER BY p.id_cliente")
         return rows_to_dict(cur.description, cur.fetchall())
 
 def editar_pedido(preco, quantidade, status, id_produto, id_pedido):
@@ -304,6 +335,26 @@ def deletar_pedido(id_pedido):
         cur.execute("DELETE FROM pedido WHERE id_pedido = ?", (id_pedido, ))
         con.commit()
 
+#_________LOGIN__________#
+def inserir_novo_usuario(email, usuario, senha):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("INSERT INTO usuario (email, usuario, senha) values (?, ?, ?)", (email, usuario, senha, ))
+        id_usuario = cur.lastrowid
+        con.commit()
+        return id_usuario
+
+def consultar_usuario(usuario, senha):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("SELECT usuario, senha FROM usuario WHERE usuario = ? AND senha = ?", (usuario, senha, ))
+        return rows_to_dict(cur.description, cur.fetchall())
+
+#-------------------------VAÇIDAÇÕES DE SENHA----------------------------------#
+def nova_senha(password):
+    password_hash = generate_password_hash(password)
+    return password_hash
+
+def verificasenha(password_hash, password):
+    return check_password_hash(password_hash, password) 
 
 ########################
 #### Inicialização. ####

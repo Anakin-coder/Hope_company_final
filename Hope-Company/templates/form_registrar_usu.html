@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Login</title>
+    <title>Registrar usuário</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -13,8 +13,14 @@
 <script type="text/javascript">
        
     function validar() {
+        const email = document.getElementById('email')
         const senha = document.getElementById('senha');
         const usuario = document.getElementById('usuario');
+        if (email.value == "") {
+            alert("Digite o nome de usuário");
+            return false;
+        }
+
         if (usuario.value == "") {
             alert("Digite o nome de usuário");
             return false;
@@ -47,8 +53,12 @@
             <div id="login-row" class="row justify-content-center align-items-center">
                 <div id="login-column" class="col-md-6">
                     <div id="login-box" class="col-md-12">
-                        <form id="login-form" class="form" action="/" method="POST">
-                            <h3 class="text-center text-info">Login</h3>
+                        <form id="login-form" class="form" method="POST" action ="/registrar/{{id_usuario}}/">
+                            <h3 class="text-center text-info">Cadastro</h3>
+                            <div class="form-group">
+                                <label for="email" class="text-info">E-mail</label><br>
+                                <input type="text" name="email" id="email" class="form-control">
+                            </div>
                             <div class="form-group">
                                 <label for="usuario" class="text-info">Usuario</label><br>
                                 <input type="text" name="usuario" id="usuario" class="form-control">
@@ -58,18 +68,15 @@
                                 <input href="/menu " type="text" name="senha" id="senha" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="lembrar" class="text-info"><span>lembrar</span> <span><input id="lembrar" name="lembrar" type="checkbox"></span></label><br>
                                 <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                                <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/">Cancelar</a>
                             </div>
-                            <div id="register-link" class="text-right">
-                                <a href="registrar/novo" class="text-info">Cadastre aqui</a>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
 </body>
 
