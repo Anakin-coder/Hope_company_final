@@ -5,28 +5,27 @@
 <head>
     <meta charset="UTF-8" />
     <title>Login</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <script type="text/javascript">
        
     function validar() {
         const senha = document.getElementById('senha');
         const usuario = document.getElementById('usuario');
+        const email = document.getElementById('email');
+
         if (usuario.value == "") {
             alert("Digite o nome de usuário");
             return false;
         }
 
-        if (senha.value == "") {
-            alert("Digite a senha.");
-            return false
+        if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
+                alert("Preencha o e-mail corretamente");
+                return false;
         }
 
-        if (senha.value.length < 4) {
-            alert("Sua senha deve conter mais que quatro dígitos");
+        if (senha.value == "") {
+            alert("Digite a senha.");
             return false
         }
         return true;
@@ -54,15 +53,22 @@
                                 <input type="text" name="usuario" id="usuario" class="form-control">
                             </div>
                             <div class="form-group">
+                                <label for="email" class="text-info">E-mail</label><br>
+                                <input type="text" name="email" id="email" class="form-control">
+                            </div>
+                            <div class="form-group">
                                 <label for="senha" class="text-info">Senha:</label><br>
                                 <input href="/menu " type="text" name="senha" id="senha" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label for="lembrar" class="text-info"><span>lembrar</span> <span><input id="lembrar" name="lembrar" type="checkbox"></span></label><br>
-                                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Entrar</button> 
                             </div>
                             <div id="register-link" class="text-right">
                                 <a href="registrar/novo" class="text-info">Cadastre aqui</a>
+                            </div>
+                            <div id="register-link" class="text-right">
+                                <a href="nova/senha" class="text-info">Esqueci minha senha</a>
                             </div>
                         </form>
                     </div>

@@ -5,10 +5,8 @@
 <head>
     <meta charset="UTF-8" />
     <title>Registrar usuário</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 </head>
 <script type="text/javascript">
        
@@ -16,11 +14,11 @@
         const email = document.getElementById('email')
         const senha = document.getElementById('senha');
         const usuario = document.getElementById('usuario');
-        if (email.value == "") {
-            alert("Digite o nome de usuário");
-            return false;
-        }
-
+        if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
+                alert("Preencha o e-mail corretamente");
+                return false;
+            }
+        
         if (usuario.value == "") {
             alert("Digite o nome de usuário");
             return false;
@@ -56,11 +54,11 @@
                         <form id="login-form" class="form" method="POST" action ="/registrar/{{id_usuario}}/">
                             <h3 class="text-center text-info">Cadastro</h3>
                             <div class="form-group">
-                                <label for="email" class="text-info">E-mail</label><br>
+                                <label for="email" class="text-info">Usuario</label><br>
                                 <input type="text" name="email" id="email" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="usuario" class="text-info">Usuario</label><br>
+                                <label for="usuario" class="text-info">E-mail</label><br>
                                 <input type="text" name="usuario" id="usuario" class="form-control">
                             </div>
                             <div class="form-group">

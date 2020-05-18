@@ -1,45 +1,61 @@
 from flask import Flask, request, render_template
-from werkzeug.security import generate_password_hash, check_password_hash
+from entities.usuario import Usuario
+from entities.produtos import Produto
+from entities.pedido import Pedido
 from contextlib import closing
 import sqlite3
 
 ############################
 #### Definições da API. ####
 ############################
-
+u = Usuario()
 app = Flask(__name__)
+
 
 #---------------------------------LOGIN-----------------------------------------------#
 
 @app.route("/", methods = ["GET"])
-def login():
+def form_login():
     return render_template("login.html", usuario = "", senha = "")
 
 @app.route("/", methods = ["POST"])
 def login_api():
-    usuario = request.form["usuario"]
-    senha = request.form["senha"]
-    user = consultar_usuario(usuario, senha)
-    '''hash_senha = nova_senha(senha)'''
-    '''if verificasenha(hash_senha, senha) is True:'''
-    if len(user) == 0:
-        return render_template("login.html", mensagem = "Usuario ou senha incorretos tente novamente")
-    return render_template("menu.html", mensagem = f"Bem vindo, {usuario}")
-    
+    u.nome = request.form['usuario']
+    u.email = request.form['email']
+    senha = request.form['senha']
+    usuarios = consultar_usuario(u.nome, u.email)
+    print(u.verifica_senha(senha))
+    if u.verifica_senha(senha) is True:
+        if len(usuarios) > 0:
+            return render_template("menu.html", mensagem = f"Bem vindo, {u.nome}")
+    return render_template('login.html', mensagem = '<h1>Usuário não está cadastrado</h1>')
 #---------------------------------CADASTRO DE NOVO USUARIO-----------------------------------------------#
 
 @app.route("/registrar/novo/", methods = ["GET"])
-def registrar_novo_usu():
+def form_registrar_novo_usu_api():
     return render_template("form_registrar_usu.html", id_usuario = "novo", email = "", usuario = "", senha = "")
 
-@app.route("/registrar/<novo>/", methods = ["POST"])
-def criar_usuario():
-    email = request.form["email"]
-    usuario = request.form["usuario"]
-    senha = request.form["senha"]
-    '''hash_senha = nova_senha(senha)'''
-    inserir_novo_usuario(email, usuario, senha)
+@app.route("/registrar/novo/", methods = ["POST"])
+def criar_usuario_api():
+    u.email = request.form["email"]
+    u.nome = request.form["usuario"]
+    u.senha = request.form["senha"]
+    inserir_novo_usuario(u.email, u.nome, u.senha_hash)
     return render_template("menu.html", mensagem = "Cadastro efetuado com sucesso")
+
+#---------------------------------LEMBRAR SENHA-----------------------------------------------#
+
+@app.route("/nova/senha", methods = ["GET"])
+def form_lembrar_senha_api():
+    return render_template("form_lembrar_senha.html",  email = "", usuario = "", senha = "")
+
+@app.route("/nova/senha", methods = ["POST"])
+def lembrar_senha_api():
+    u.email = request.form["email"]
+    u.nome = request.form["usuario"]
+    u.senha = request.form["senha"]
+    lembrar_senha(u.email, u.nome, u.senha_hash)
+    return render_template("login.html", mensagem = "Sua senha foi atualizada")
    
 #---------------------------------MENU-----------------------------------------------#
 @app.route("/menu/")
@@ -56,14 +72,14 @@ def form_criar_cliente_api():
     return render_template("form_cliente.html", id_cliente = "novo", nome = "", sexo = "", telefone = "", endereco = "", email ="",)
 
 @app.route("/cliente/novo/", methods = ["POST"])
-def criar_cliente_api():    
-    nome = request.form["nome"]
-    sexo = request.form["sexo"]
-    telefone = request.form["telefone"]
-    endereco = request.form["endereco"]
-    email = request.form["email"]
-    id_cliente = criar_cliente(nome, sexo, telefone, endereco, email)
-    return render_template("menu.html", mensagem = f"{'O' if sexo == 'M' else 'A'} cliente {nome} foi criad{'o' if sexo == 'M' else 'a'} com o id {id_cliente}.")
+def criar_cliente_api():
+    u.nome = request.form["nome"]
+    u.sexo = request.form["sexo"]
+    u.telefone = request.form["telefone"]
+    u.endereco = request.form["endereco"]
+    u.email = request.form["email"]
+    id_cliente = criar_cliente(u.nome, u.sexo, u.telefone, u.endereco, u.email)
+    return render_template("menu.html", mensagem = f"{'O' if u.sexo == 'M' else 'A'} cliente {u.nome} foi criad{'o' if u.sexo == 'M' else 'a'} com o id {id_cliente}.")
 
 @app.route("/cliente/<int:id_cliente>/", methods = ["GET"])
 def form_alterar_cliente_api(id_cliente):
@@ -74,15 +90,15 @@ def form_alterar_cliente_api(id_cliente):
 
 @app.route("/cliente/<int:id_cliente>/", methods = ["POST"])
 def alterar_cliente_api(id_cliente):
-    nome = request.form["nome"]
-    sexo = request.form["sexo"]
-    telefone = request.form["telefone"]
-    endereco = request.form["endereco"]
-    email = request.form["email"]
+    u.nome = request.form["nome"]
+    u.sexo = request.form["sexo"]
+    u.telefone = request.form["telefone"]
+    u.endereco = request.form["endereco"]
+    u.email = request.form["email"]
     cliente = consultar_cliente(id_cliente)
     if cliente == None:
         return render_template("menu.html", mensagem = f"Esse cliente não existe!"), 404
-    editar_cliente(id_cliente, nome, sexo, telefone, endereco, email)
+    editar_cliente(id_cliente, u.nome, u.sexo, u.telefone, u.endereco, u.email)
     return render_template("menu.html", mensagem = f"O  cliente {id_cliente} foi editado com sucesso!")
 
 
@@ -231,11 +247,12 @@ CREATE TABLE IF NOT EXISTS pedido (
     FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
     FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
 );
+
 CREATE TABLE IF NOT EXISTS usuario (
     id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
     email VARCHAR(50),
     usuario VARCHAR(50),
-    senha
+    senha  VARCHAR2(100)
 );
 """
 
@@ -343,19 +360,15 @@ def inserir_novo_usuario(email, usuario, senha):
         con.commit()
         return id_usuario
 
-def consultar_usuario(usuario, senha):
+def consultar_usuario(usuario, email):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT usuario, senha FROM usuario WHERE usuario = ? AND senha = ?", (usuario, senha, ))
-        return rows_to_dict(cur.description, cur.fetchall())
+        cur.execute("SELECT senha FROM usuario WHERE usuario = ? AND email = ?", (usuario, email, ))
+        return cur.fetchone()
 
-#-------------------------VAÇIDAÇÕES DE SENHA----------------------------------#
-def nova_senha(password):
-    password_hash = generate_password_hash(password)
-    return password_hash
-
-def verificasenha(password_hash, password):
-    return check_password_hash(password_hash, password) 
-
+def lembrar_senha(usuario, email, senha):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("UPDATE usuario SET senha = ? WHERE usuario = ? AND email = ?", (senha, usuario, email, ))
+        con.commit()
 ########################
 #### Inicialização. ####
 ########################
