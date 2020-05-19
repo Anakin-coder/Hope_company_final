@@ -6,3 +6,4 @@ class Produto:
         self.preco_unitario = preco_unitario
 
 
+    

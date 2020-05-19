@@ -38,9 +38,22 @@
             </tbody>
         </table>
     </div>
+
+    <div>
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="id_cliente">Cliente:</label>
+            <div class="col-md-2">
+                <select class="form-control" name="id_cliente" id="id_cliente">
+                {% for cliente in clientes %}                    
+                    <option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['id_cliente']}}</option>
+                {% endfor %}
+            </select>
+            </div>
+        </div>
+    
     <div class="form-group">
         <label class="col-md-4 control-label" for="btnsalvar"></label>
-        <div class="col-md-8">
+        <div class="col-md-8" style="text-align: left;">
             <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Voltar</a>
         </div>
     </div>
