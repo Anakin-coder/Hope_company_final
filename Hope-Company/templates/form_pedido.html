@@ -4,33 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Pedidos</title>
+    <title>Status do Pedidos</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
     <script type="text/javascript">
         const id_pedido = "{{id_pedido}}";
-
-        function validar() {
-            const preco = document.getElementById('preco')
-            const quantidade = document.getElementById('quantidade')
-
-            if (preco.value == "" || preco.value < 0) {
-                alert("Preço incorreto!");
-                return false;
-            }
-
-            if (quantidade.value == "" || quantidade.value < 0) {
-                alert("Quantidade incorreta!");
-                return false;
-            }
-
-            if (status.value == "") {
-                alert("Selecione o status!");
-                return false;
-            }
-
-            return true;
-        }
 
         function salvar() {
             if (!validar()) return;
@@ -62,7 +40,7 @@
     <form class="form-horizontal" method="POST" action="/pedido/{{id_pedido}}/" id="form_principal">
         {% if id_pedido != 'novo'%}
         <p>
-            <label>Numero do Pedido:</label> {{id_pedido}}
+            <label>Status do Pedido:</label> {{id_pedido}}
         </p>
         {% endif %}
         <!-- Form Name -->
@@ -82,47 +60,17 @@
         {% endif %}
 
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_produto">Produto</label>
-            <div class="col-md-2">
-                <select class="form-control" name="id_produto" id="id_produto">
-                    {% for produto in produtos %}
-                        <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['id_produto']}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-
-
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="preco">Preço</label>
-            <div class="col-md-2">
-                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md" value="{{preco}}">
-
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
-            <div class="col-md-2">
-                <input id="quantidade" name="quantidade" type="number" placeholder="" class="form-control input-md" value="{{preco}}">
-
-            </div>
-        </div>
-
-        <div class="form-group">
             <label class="col-md-4 control-label" for="status">Status</label>
-            <input type="radio" id="status" name="status" value="Ok" {% if status=='Ok' %}checked="checked" {% endif %}>Pedido Pago</input>
-            <input type="radio" id="status" name="status" value="Pendente" {% if sexo=='Pendente' %}checked="checked" {% endif %}>Pedido Pendente</input>
-            {% if id_pedido != 'novo' %}
-            <input type="radio" id="status" name="status" value="Finalizado" {% if status=='Ok' %}checked="checked" {% endif %}>Pedido Finalizado</input>
-            {% endif %}
+            <div class="col-md-2">
+                <input id="status" name="status" type="text" placeholder="" class="form-control input-md" value="{{status}}">
+            </div>
         </div>
-
+        
         <!-- Button (Double) -->
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                <button type="submit" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
                 {% if id_pedido != 'novo' %}
                 <button type="button" id="btnexcluir" name="btnexcluir" class="btn btn-primary" onclick="excluir()">Excluir</button>
                 {% endif %}

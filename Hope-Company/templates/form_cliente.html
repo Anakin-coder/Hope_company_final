@@ -7,6 +7,7 @@
     <title>Cadastrar cliente</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script type="text/javascript">
+    const id_pedido = "{{id_cliente}}";
         function validar() {
             const nome = document.getElementById('nome');
             const sexo_masc = document.getElementById('sexo_masc');
@@ -44,7 +45,6 @@
         }
     </script>
 </head>
-
 <body>
     <form class="form-horizontal" action="/cliente/{{id_cliente}}/" method="POST" id="form_principal">
         {% if id_cliente != 'novo'%}

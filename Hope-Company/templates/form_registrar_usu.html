@@ -9,7 +9,8 @@
 
 </head>
 <script type="text/javascript">
-       
+    const id_usuario = "{{id_usuario}}";
+    
     function validar() {
         const email = document.getElementById('email')
         const senha = document.getElementById('senha');
@@ -52,22 +53,22 @@
                 <div id="login-column" class="col-md-6">
                     <div id="login-box" class="col-md-12">
                         <form id="login-form" class="form" method="POST" action ="/registrar/{{id_usuario}}/">
-                            <h3 class="text-center text-info">Cadastro</h3>
+                            <h3 class="text-center text-dark">Cadastro</h3>
                             <div class="form-group">
-                                <label for="email" class="text-info">E-mail:</label><br>
+                                <label for="email" class="text-dark">E-mail:</label><br>
                                 <input type="text" name="email" id="email" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="usuario" class="text-info">Usuário:</label><br>
+                                <label for="usuario" class="text-dark">Usuário:</label><br>
                                 <input type="text" name="usuario" id="usuario" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="senha" class="text-info">Senha:</label><br>
+                                <label for="senha" class="text-dark">Senha:</label><br>
                                 <input href="/menu " type="text" name="senha" id="senha" class="form-control">
                             </div>
                             <div class="form-group">
                                 <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
-                                <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/">Cancelar</a>
+                                <a id="btncancelar" name="btncancelar" class="btn btn-dark" href="/">Cancelar</a>
                             </div>
                             </div>
                         </form>

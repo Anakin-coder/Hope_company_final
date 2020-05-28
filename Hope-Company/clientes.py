@@ -19,7 +19,6 @@ def form_login():
 
 @app.route("/", methods = ["POST"])
 def login_api():
-    print('oi cheguei aqui')
     nome = request.form['usuario']
     senha = request.form['senha']
     u = consultar_usuario(nome)
@@ -42,20 +41,6 @@ def criar_usuario_api():
     senha = request.form["senha"]
     inserir_novo_usuario(email, nome, senha)
     return render_template("menu.html", mensagem = "Cadastro efetuado com sucesso")
-
-#---------------------------------LEMBRAR SENHA-----------------------------------------------#
-
-@app.route("/nova/senha", methods = ["GET"])
-def form_lembrar_senha_api():
-    return render_template("form_lembrar_senha.html",  email = "", usuario = "", senha = "")
-
-@app.route("/nova/senha", methods = ["POST"])
-def lembrar_senha_api():
-    email = request.form["email"]
-    nome = request.form["usuario"]
-    senha = request.form["senha"]
-    lembrar_senha(email, nome, senha)
-    return render_template("login.html", mensagem = "Sua senha foi atualizada")
    
 #---------------------------------MENU-----------------------------------------------#
 @app.route("/menu/")
@@ -102,7 +87,7 @@ def alterar_cliente_api(id_cliente):
     return render_template("menu.html", mensagem = f"O  cliente {id_cliente} foi editado com sucesso!")
 
 
-#_______PRODUTOS________#
+#---------------------------------PRODUTO-----------------------------------------------#
 
 @app.route("/produto/")
 def listar_produtos_api():
@@ -146,8 +131,7 @@ def deletar_produto_api(id_produto):
     deletar_produto(id_produto)
     return render_template("menu.html", mensagem = f"O produto {produto['descricao']} com o id {id_produto} foi excluído.")
 
-
-#_______PEDIDO________#
+#---------------------------------PEDIDO-----------------------------------------------#
 
 @app.route("/pedido/")
 def listar_pedidos_api():
@@ -155,16 +139,13 @@ def listar_pedidos_api():
 
 @app.route("/pedido/novo/", methods = ["GET"])
 def form_criar_pedido_api():
-    return render_template("form_pedido.html", id_pedido = "novo", quantidade = "", status = "", preco = "", clientes = listar_clientes(), produtos = listar_produtos())
+    return render_template("form_pedido.html", id_pedido = "novo", status = "", id_cliente="", clientes = listar_clientes(), produtos = listar_produtos())
 
 @app.route("/pedido/novo/", methods = ["POST"])
 def criar_pedido_api():
-    quantidade = request.form["quantidade"]
     status = request.form["status"]
-    preco = request.form["preco"]
     id_cliente = request.form["id_cliente"]
-    id_produto = request.form["id_produto"]
-    id_pedido = criar_pedido(quantidade, status, preco, id_cliente, id_produto)
+    id_pedido = criar_pedido(status, id_cliente)
     return render_template("menu.html", mensagem = f"Novo pedido gerado: {id_pedido}!")
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["GET"])
@@ -177,13 +158,10 @@ def form_alterar_pedido_api(id_pedido):
 @app.route("/pedido/<int:id_pedido>/", methods = ["POST"])
 def alterar_pedido_api(id_pedido):
     pedido = consultar_pedido(id_pedido)
-    quantidade = request.form['quantidade']
     status = request.form['status']
-    preco = request.form['preco']
-    id_produto = request.form['id_produto']
     if pedido == None:
         return render_template("menu.html", mensagem = f"Esse pedido não existe."), 404
-    editar_pedido(preco, quantidade, status, id_produto, id_pedido)
+    editar_pedido(status, id_pedido)
     return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi editado com sucesso!")
 
 @app.route("/pedido/<int:id_pedido>", methods = ["DELETE"])
@@ -193,6 +171,19 @@ def deletar_pedido_api(id_pedido):
         return render_template("menu.html", mensagem = "Esse pedido nem mesmo existia mais."), 404
     deletar_pedido(id_pedido)
     return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi excluído com sucesso!")
+#---------------------------------PRODUTO PEDIDO-----------------------------------------------#
+@app.route("/produto/pedido/", methods = ["GET"])
+def form_prod_pedido_api():
+    return render_template("form_produto_pedido.html", preco = "", quantidade = "", id_produto = "", id_pedido = "", produtos = listar_produtos(), pedidos = listar_pedidos())
+
+@app.route("/produto/pedido/", methods = ["POST"])
+def criar_prod_pedido_api():
+    preco = request.form['preco']
+    quantidade = request.form['quantidade']
+    id_produto = request.form['id_produto']
+    id_pedido = request.form['id_pedido']
+    criar_prod_pedido(preco, quantidade, id_produto, id_pedido)
+    return render_template('menu.html', mensagem = 'Pedido realizado com sucesso')
 
 ###############################################
 #### Funções auxiliares de banco de dados. ####
@@ -220,7 +211,7 @@ def rows_to_dict(description, rows):
 ####################################
 #  IF NOT EXISTS
 sql_create = """
-CREATE TABLE  IF NOT EXISTS cliente (
+CREATE TABLE IF NOT EXISTS cliente (
     id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
     nome VARCHAR(50) NOT NULL,
     sexo VARCHAR(1) NOT NULL,
@@ -238,14 +229,18 @@ CREATE TABLE IF NOT EXISTS produto (
 
 CREATE TABLE IF NOT EXISTS pedido (
     id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_produto INTEGER NOT NULL,
     id_cliente INTEGER NOT NULL,
+    datahora DEFAULT CURRENT_DATE,
+    status TINYINT(1),
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+);
+CREATE TABLE IF NOT EXISTS produto_pedido (
+    id_produto INTEGER NOT NULL,
+    id_pedido INTEGER NOT NULL,
     preco REAL NOT NULL,
     quantidade INTEGER NOT NULL,
-    datahora DATETIME DEFAULT CURRENT_TIME,
-    status TINYINT(1),
     FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
-    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+    FOREIGN KEY(id_pedido) REFERENCES pedido(id_pedido)
 );
 
 CREATE TABLE IF NOT EXISTS usuario (
@@ -265,7 +260,7 @@ def criar_bd():
         cur.executescript(sql_create)
         con.commit()
 
-#_______CLIENTES________#
+#------------------------CLIENTES---------------------#
 def criar_cliente(nome, sexo, telefone, endereco, email):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("INSERT INTO cliente (nome, sexo, telefone, endereco, email) VALUES (?, ?, ?, ?, ?)", (nome, sexo, telefone, endereco, email))
@@ -293,8 +288,8 @@ def deletar_cliente(id_cliente):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("DELETE FROM cliente WHERE id_cliente = ?", (id_cliente, ))
         con.commit()
-    
-#_________PRODUTOS__________#
+
+#--------------------PRODUTO------------------------#    
 
 def criar_produto(descricao, quantidade, preco_unitario):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
@@ -323,28 +318,28 @@ def deletar_produto(id_produto):
         cur.execute("DELETE FROM produto WHERE id_produto = ?", (id_produto, ))
         con.commit()
 
-#_________PEDIDOS__________#
+#-----------------------PEDIDOS-------------------------------#
 
-def criar_pedido(quantidade, status, preco, id_cliente, id_produto): 
+def criar_pedido(status, id_cliente): 
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO pedido (quantidade, status, preco, id_cliente, id_produto) VALUES (?, ?, ?, ?, ?)", (quantidade, status, preco, id_cliente, id_produto, ))
+        cur.execute("INSERT INTO pedido (status, id_cliente) VALUES (?, ?)", (status, id_cliente, ))
         id_pedido = cur.lastrowid
         con.commit()
         return id_pedido
 
 def consultar_pedido(id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, datahora, status FROM pedido p WHERE id_pedido = ?", (id_pedido, ))
+        cur.execute("SELECT id_pedido, id_cliente, datahora, status FROM pedido p WHERE id_pedido = ?", (id_pedido, ))
         return row_to_dict(cur.description, cur.fetchone())
 
 def listar_pedidos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_pedido, id_produto, id_cliente, preco, quantidade, datahora, status FROM pedido p ORDER BY p.id_cliente")
+        cur.execute("SELECT p.id_pedido, p.id_cliente, p.datahora, p.status FROM pedido p ORDER BY p.id_cliente")
         return rows_to_dict(cur.description, cur.fetchall())
 
-def editar_pedido(preco, quantidade, status, id_produto, id_pedido):
+def editar_pedido(status, id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE pedido SET preco = ?, quantidade = ?, status = ?, id_produto = ? WHERE id_pedido = ?", (preco, quantidade, status, id_produto, id_pedido, ))
+        cur.execute("UPDATE pedido SET status = ? WHERE id_pedido = ?", (status, id_pedido, ))
         con.commit()    
 
 def deletar_pedido(id_pedido):
@@ -352,7 +347,8 @@ def deletar_pedido(id_pedido):
         cur.execute("DELETE FROM pedido WHERE id_pedido = ?", (id_pedido, ))
         con.commit()
 
-#_________LOGIN__________#
+#--------------------LOGIN------------------#
+
 def inserir_novo_usuario(email, usuario, senha):
     senha_hash = generate_password_hash(senha)
     with closing(conectar()) as con, closing(con.cursor()) as cur:
@@ -369,10 +365,18 @@ def consultar_usuario(usuario):
             return None
         return Usuario(u['id_usuario'], u['usuario'], u['email'], u['senha'])
 
-def lembrar_senha(usuario, email, senha):
+#--------------------PRODUTO PEDIDO------------------#
+
+def criar_prod_pedido(preco, quantidade, id_produto, id_pedido): 
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE usuario SET senha = ? WHERE usuario = ? AND email = ?", (senha, usuario, email, ))
+        cur.execute("INSERT INTO produto_pedido (preco, quantidade, id_produto, id_pedido) VALUES (?, ?, ?, ?)", (preco, quantidade, id_produto, id_pedido, ))
         con.commit()
+
+def consultar_prod_pedido(id_pedido):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("SELECT preco, quantidade, id_produto, id_pedido FROM produto_pedido p WHERE id_pedido = ?", (id_pedido, ))
+        return row_to_dict(cur.description, cur.fetchone())
+
 ########################
 #### Inicialização. ####
 ########################

@@ -6,6 +6,7 @@
     <meta charset="UTF-8" />
     <title>Login</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
 </head>
 <script type="text/javascript">
        
@@ -31,35 +32,39 @@
     }
 
 </script>
+<style>
+body h3{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
 
+</style>
 
 <body>
     {{mensagem}}
     <div id="login">
         <h3 class="text-center text-white pt-5">Login form</h3>
+
         <div class="container">
             <div id="login-row" class="row justify-content-center align-items-center">
                 <div id="login-column" class="col-md-6">
                     <div id="login-box" class="col-md-12">
                         <form id="login-form" class="form" action="/" method="POST">
-                            <h3 class="text-center text-info">Login</h3>
+                            <h3 class="text-center text-dark">Login</h3>
                             <div class="form-group">
-                                <label for="usuario" class="text-info">Usuario</label><br>
+                                <label for="usuario" class="text-dark">Usuario</label><br>
                                 <input type="text" name="usuario" id="usuario" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="senha" class="text-info">Senha:</label><br>
+                                <label for="senha" class="text-dark">Senha:</label><br>
                                 <input href="/menu " type="text" name="senha" id="senha" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="lembrar" class="text-info"><span>lembrar</span> <span><input id="lembrar" name="lembrar" type="checkbox"></span></label><br>
-                                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Entrar</button> 
+                                <label for="lembrar" class="text-dark"><span>lembrar</span> <span><input id="lembrar" name="lembrar" type="checkbox"></span></label><br>
+                                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-dark" onclick="salvar()">Entrar</button> 
                             </div>
                             <div id="register-link" class="text-right">
-                                <a href="registrar/novo" class="text-info">Cadastre aqui</a>
-                            </div>
-                            <div id="register-link" class="text-right">
-                                <a href="nova/senha" class="text-info">Esqueci minha senha</a>
+                                <a href="registrar/novo" class="text-dark">Cadastre aqui</a>
                             </div>
                         </form>
                     </div>
@@ -67,7 +72,6 @@
             </div>
         </div>
     </div>
-
 </body>
 
 </html>

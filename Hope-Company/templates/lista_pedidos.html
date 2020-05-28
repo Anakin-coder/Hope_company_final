@@ -1,23 +1,13 @@
-<!DOCTYPE html>
-<html>
+{% extends "menu.html" %}
+{% block title %}Pedidos{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todos os Pedidos</title>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-</head>
-
-<body>
+{% block content %}
     <div class="table-responsive" id="sailorTableArea">
         <table id="sailorTable" class="table table-striped table-bordered" width="100%">
             <thead>
                 <tr>
                     <th>Pedido</th>
                     <th>Cliente</th>
-                    <th>Produto</th>
-                    <th>Preço</th>
-                    <th>Quantidade</th>
                     <th>Hora do Pedido</th>
                     <th>Status</th>
                 </tr>
@@ -27,9 +17,6 @@
                 <tr>
                     <td>{{pedido['id_pedido']}}</td>
                     <td>{{pedido['id_cliente']}}</td>
-                    <td>{{pedido['id_produto']}}</td>
-                    <td>{{pedido['preco']}}</td>
-                    <td>{{pedido['quantidade']}}</td>
                     <td>{{pedido['datahora']}}</td>
                     <td>{{pedido['status']}}</td>
                     <td><a href="/pedido/{{pedido['id_pedido']}}" class="botao">Editar</a></td>
@@ -39,24 +26,12 @@
         </table>
     </div>
 
-    <div>
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="id_cliente">Cliente:</label>
-            <div class="col-md-2">
-                <select class="form-control" name="id_cliente" id="id_cliente">
-                {% for cliente in clientes %}                    
-                    <option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['id_cliente']}}</option>
-                {% endfor %}
-            </select>
-            </div>
-        </div>
-    
+  
     <div class="form-group">
         <label class="col-md-4 control-label" for="btnsalvar"></label>
-        <div class="col-md-8" style="text-align: left;">
+        <div class="col-md-8 text-right">
             <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Voltar</a>
         </div>
     </div>
 </body>
-
-</html>
+{% endblock %}

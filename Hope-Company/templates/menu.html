@@ -1,35 +1,93 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-</head>
+  {% block head%}
+  <meta charset="UTF-8">
+  <title>{%block title%}Hope Company{% endblock %}</title>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous">
+   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <style>
+        .custom-restricted-width {
+            /* To limit the menu width to the content of the menu: */
+            display: inline-block;
+            background-color: #191818;
+            width: 200px;
+            /* Or set the width explicitly: */
+            /* width: 10em; */
+        }
+        .pure-menu-heading{
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12pt;
+            color: white; 
+        }
+        .pure-menu-link{
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12pt;
+        }
+        .pure-menu{
+            height: 100%;
+            position: fixed;
+        }
+        .pure-menu-item {
+            padding: 1px;
+            
+        }
+        aside {
+            position: relative;
+            float: right;
+            top: 0;
+            left: 0;
+            width: 1165px;
+            padding: 2px;
+        }
+    </style>
+{% endblock %}
+
+<header>
+    {% block navbar %}
+    <div class="pure-menu custom-restricted-width">
+        <span class="pure-menu-heading">Hope Company</span>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+                <a href="/menu/" class="pure-menu-link">Menu</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/cliente" class="pure-menu-link">Clientes</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/produto" class="pure-menu-link">Produtos</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/pedido" class="pure-menu-link">Pedidos</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/cliente/novo" class="pure-menu-link">Cadastrar Cliente</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/produto/novo" class="pure-menu-link">Cadastrar Produto</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/pedido/novo" class="pure-menu-link">Confirmar pedido</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/produto/pedido" class="pure-menu-link">Realizar Pedido</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/" class="pure-menu-link">Sair</a>
+            </li>
+        </ul>
+    </div>
+</header>
+{% endblock %}
 
 <body>
+    {% block body%}
+        <aside>
+            {% block content%}
 
-    {% if mensagem != '' %}
-    <h2>{{mensagem}}</h2>
-    {% endif %}
-    <nav class="menum navbar navbar-light navbar-expand-md justify-content-center fixed-top">
-        <div class="container">
-
-            <div class="navbar-collapse collapse justify-content-between align-items-center w-100" id="collapsingNavbar2">
-                <ul class="topBotomBordersOut navbar-nav mx-auto text-center">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/menu/">Menu</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="/cliente">Clientes</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="/produto">Produtos</a>
-                        <li class="nav-item"> <a class="nav-link" href="/pedido">Pedidos</a></li>
-                        <li class="nav-item"> <a class="nav-link" href="/cliente/novo">Cadastrar Cliente</a>
-                            <li class="nav-item"> <a class="nav-link" href="/produto/novo">Cadastrar produto</a></li>
-                            <li class="nav-item"> <a class="nav-link" href="/pedido/novo">Realizar Pedido</a></li>
-                            <li class="nav-item active"><a class="nav-link" href="/">Sair</a></li>
-                </ul>
-            </div>
-        </div>
-</nav>
-
-
+            {% endblock %}
+        </aside>
+    {% endblock %}
 </body>
 </html>

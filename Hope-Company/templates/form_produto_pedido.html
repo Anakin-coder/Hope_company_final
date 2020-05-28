@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Pedidos</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+    <script type="text/javascript">
+
+        function validar() {
+            const preco = document.getElementById('preco')
+            const quantidade = document.getElementById('quantidade')
+            const id_produto = document.getElementById('id_produto')
+            const id_pedido = document.getElementById('id_pedido')
+
+            if (preco.value == "" || preco.value < 0) {
+                alert("Preço incorreto!");
+                return false;
+            }
+            
+            if (quantidade.value == "" || quantidade.value < 0) {
+                alert("Quantidade não pode ser menor que zero");
+                return false;
+            }
+            return true;
+        }
+
+        function salvar() {
+            if (!validar()) return;
+            document.getElementById("form_principal").submit();
+        }
+
+        function excluir() {
+            if (!confirm("Você tem certeza?")) return;
+            xhr = new XMLHttpRequest();
+            xhr.open('DELETE', '/pedido/' + id_pedido);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status === 200 || xhr.status === 404) {
+                    document.open();
+                    document.write(xhr.responseText);
+                    document.close();
+                } else {
+                    alert('Erro ' + xhr.status);
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</head>
+
+<body>
+    
+    <form class="form-horizontal" method="POST" action="/produto/pedido/" id="form_principal">
+       
+        <!-- Form Name -->
+        <legend>Cadastro de Produtos pedidos</legend>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="id_produto">Produto:</label>
+            <div class="col-md-2">
+                <select class="form-control" name="id_produto" id="id_produto">
+                {% for produto in produtos %}                    
+                    <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['id_produto']}}</option>
+                {% endfor %}
+            </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="id_pedido">Pedido</label>
+            <div class="col-md-2">
+                <select class="form-control" name="id_pedido" id="id_pedido">
+                    {% for pedido in pedidos %}
+                        <option value="{{pedido['id_pedido']}}" {% if id_pedido == pedido['id_pedido'] %}selected="selected"{% endif %}>{{pedido['id_pedido']}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="preco">Preço</label>
+            <div class="col-md-2">
+                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md" value="{{preco}}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
+            <div class="col-md-2">
+                <input id="quantidade" name="quantidade" type="number" placeholder="" class="form-control input-md" value="{{quantidade}}">
+            </div>
+        </div>
+
+        <!-- Button (Double) -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="btnsalvar"></label>
+            <div class="col-md-8">
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
+
+            </div>
+        </div>
+    
+</html>
