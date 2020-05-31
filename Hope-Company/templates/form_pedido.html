@@ -33,6 +33,7 @@
             xhr.send();
         }
     </script>
+
 </head>
 
 <body>
@@ -48,11 +49,11 @@
         <!-- Text input-->
         {% if id_pedido == 'novo' %}
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_cliente">Cliente:</label>
+            <label class="col-md-4 control-label" for="nome">Cliente:</label>
             <div class="col-md-2">
-                <select class="form-control" name="id_cliente" id="id_cliente">
+                <select class="form-control" name="nome" id="nome">
                 {% for cliente in clientes %}                    
-                    <option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['id_cliente']}}</option>
+                    <option value="{{cliente['id_cliente']}}" {% if id_cliente == cliente['id_cliente'] %}selected="selected"{% endif %}>{{cliente['nome']}}</option>
                 {% endfor %}
             </select>
             </div>
@@ -60,9 +61,34 @@
         {% endif %}
 
         <div class="form-group">
+            <label class="col-md-4 control-label" for="descricao">Produto:</label>
+            <div class="col-md-2">
+                <select class="form-control" name="descricao" id="descricao">
+                {% for produto in produtos %}
+                    <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['descricao']}}</option>
+                {% endfor %}
+            </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="ped_qtd">Quantidade</label>
+            <div class="col-md-2">
+                <input id="ped_qtd" name="ped_qtd" type="text" placeholder="" class="form-control input-md" value="{{ped_qtd}}">
+            </div>
+        </div>
+
+        <div class="form-group">
             <label class="col-md-4 control-label" for="status">Status</label>
             <div class="col-md-2">
                 <input id="status" name="status" type="text" placeholder="" class="form-control input-md" value="{{status}}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="ped_valor">Valor</label>
+            <div class="col-md-2">
+                <input id="ped_valor" name="ped_valor" type="text" placeholder="" class="form-control input-md" value="{{ped_valor}}">
             </div>
         </div>
         

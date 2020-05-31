@@ -60,31 +60,43 @@
         <legend>Cadastro de Produtos pedidos</legend>
         <!-- Text input-->
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_produto">Produto:</label>
+            <label class="col-md-4 control-label" for="descricao">Produto:</label>
             <div class="col-md-2">
-                <select class="form-control" name="id_produto" id="id_produto">
-                {% for produto in produtos %}                    
-                    <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['id_produto']}}</option>
+                <select class="form-control" name="descricao" id="descricao">
+                {% for produto in produtos %}
+                    <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['descricao']}}</option>
                 {% endfor %}
             </select>
             </div>
         </div>
 
         <div class="form-group">
-            <label class="col-md-4 control-label" for="id_pedido">Pedido</label>
+            <label class="col-md-4 control-label" for="descricao">Registro Pedido:</label>
             <div class="col-md-2">
-                <select class="form-control" name="id_pedido" id="id_pedido">
-                    {% for pedido in pedidos %}
-                        <option value="{{pedido['id_pedido']}}" {% if id_pedido == pedido['id_pedido'] %}selected="selected"{% endif %}>{{pedido['id_pedido']}}</option>
-                    {% endfor %}
-                </select>
+                <select class="form-control" name="descricao" id="descricao">
+                {% for pedido in pedidos %}
+                    <option value="{{pedido['id_pedido']}}" {% if id_pedido == pedido['id_pedido'] %}selected="selected"{% endif %}>{{pedido['id_pedido']}}</option>
+                {% endfor %}
+            </select>
             </div>
         </div>
         
+        
+        <script type="text/javascript"> 
+            preco_unitario = getElementById("preco_unitario");
+            quantidade = getElementById("quantidade");
+                function calcula_preco(preco_unitario, quantidade) {
+                    res = preco_unitario * quantidade;
+                    return res;
+                    
+                }
+    
+        </script>
+
         <div class="form-group">
-            <label class="col-md-4 control-label" for="preco">Preço</label>
+            <label class="col-md-4 control-label" for="preco_unitario">Preço Unitario</label>
             <div class="col-md-2">
-                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md" value="{{preco}}">
+                <input id="preco_unitario" name="preco_unitario" type="number" placeholder="" class="form-control input-md" value="{{preco}}">
             </div>
         </div>
 
@@ -92,6 +104,13 @@
             <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
             <div class="col-md-2">
                 <input id="quantidade" name="quantidade" type="number" placeholder="" class="form-control input-md" value="{{quantidade}}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="preco">Preço Total</label>
+            <div class="col-md-2">
+                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md" value="{{"calcula_preco()"}}">
             </div>
         </div>
 

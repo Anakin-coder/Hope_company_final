@@ -139,13 +139,15 @@ def listar_pedidos_api():
 
 @app.route("/pedido/novo/", methods = ["GET"])
 def form_criar_pedido_api():
-    return render_template("form_pedido.html", id_pedido = "novo", status = "", id_cliente="", clientes = listar_clientes(), produtos = listar_produtos())
+    return render_template("form_pedido.html", id_pedido = "novo", status = "",  nome = "", ped_valor = "", ped_qtd = "", clientes = listar_clientes(), produtos = listar_produtos())
 
 @app.route("/pedido/novo/", methods = ["POST"])
 def criar_pedido_api():
     status = request.form["status"]
-    id_cliente = request.form["id_cliente"]
-    id_pedido = criar_pedido(status, id_cliente)
+    nome = request.form["nome"]
+    ped_valor = request.form["ped_valor"]
+    ped_qtd = request.form["ped_qtd"]
+    id_pedido = criar_pedido(status, nome, ped_valor, ped_qtd)
     return render_template("menu.html", mensagem = f"Novo pedido gerado: {id_pedido}!")
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["GET"])
@@ -171,18 +173,20 @@ def deletar_pedido_api(id_pedido):
         return render_template("menu.html", mensagem = "Esse pedido nem mesmo existia mais."), 404
     deletar_pedido(id_pedido)
     return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi excluído com sucesso!")
-#---------------------------------PRODUTO PEDIDO-----------------------------------------------#
+#---------------------------------ITENS PEDIDO-----------------------------------------------#
 @app.route("/produto/pedido/", methods = ["GET"])
 def form_prod_pedido_api():
-    return render_template("form_produto_pedido.html", preco = "", quantidade = "", id_produto = "", id_pedido = "", produtos = listar_produtos(), pedidos = listar_pedidos())
-
+    return render_template("form_produto_pedido.html", preco = "", quantidade = "", descrica = "", id_pedido = "", preco_unitario = "", produtos = listar_produtos(), pedidos = listar_pedidos())
+ 
 @app.route("/produto/pedido/", methods = ["POST"])
 def criar_prod_pedido_api():
     preco = request.form['preco']
     quantidade = request.form['quantidade']
-    id_produto = request.form['id_produto']
+    descricao = request.form['descricao']
     id_pedido = request.form['id_pedido']
-    criar_prod_pedido(preco, quantidade, id_produto, id_pedido)
+    preco_unitario = request.form['preco_unitario']
+    descricao = request.form['descricao']
+    criar_prod_pedido(preco, quantidade, descricao, id_pedido, preco_unitario, descricao)
     return render_template('menu.html', mensagem = 'Pedido realizado com sucesso')
 
 ###############################################
@@ -220,6 +224,26 @@ CREATE TABLE IF NOT EXISTS cliente (
     email CHAR(100) NULL
 );
 
+CREATE TABLE IF NOT EXISTS pedido (
+    id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_cliente INTEGER NOT NULL,
+    datahora DEFAULT CURRENT_DATE,
+    ped_valor INTEGER,
+    ped_qtd INTERGER,
+    status TINYINT(1),
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+);
+
+CREATE TABLE IF NOT EXISTS itens_pedido (
+    id_produto INTEGER NOT NULL,
+    id_pedido INTEGER NOT NULL,
+    preco REAL NOT NULL,
+    preco_unitario REAL NOT NULL,
+    quantidade INTEGER NOT NULL,
+    FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
+    FOREIGN KEY(id_pedido) REFERENCES pedido(id_pedido)
+);
+
 CREATE TABLE IF NOT EXISTS produto (
     id_produto INTEGER PRIMARY KEY AUTOINCREMENT,
     descricao VARCHAR(50) NOT NULL,
@@ -227,20 +251,11 @@ CREATE TABLE IF NOT EXISTS produto (
     preco_unitario REAl NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS pedido (
-    id_pedido INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_cliente INTEGER NOT NULL,
-    datahora DEFAULT CURRENT_DATE,
-    status TINYINT(1),
-    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
-);
-CREATE TABLE IF NOT EXISTS produto_pedido (
-    id_produto INTEGER NOT NULL,
-    id_pedido INTEGER NOT NULL,
-    preco REAL NOT NULL,
-    quantidade INTEGER NOT NULL,
-    FOREIGN KEY(id_produto) REFERENCES produto(id_produto),
-    FOREIGN KEY(id_pedido) REFERENCES pedido(id_pedido)
+CREATE TABLE IF NOT EXISTS estoque (
+    id_estoque INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_produto VARCHAR(50) NOT NULL,
+    quantidade INTEGER,
+    FOREIGN KEY(id_produto) REFERENCES produto(id_produto)
 );
 
 CREATE TABLE IF NOT EXISTS usuario (
@@ -320,9 +335,9 @@ def deletar_produto(id_produto):
 
 #-----------------------PEDIDOS-------------------------------#
 
-def criar_pedido(status, id_cliente): 
+def criar_pedido(status, nome, ped_valor, ped_qtd): 
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO pedido (status, id_cliente) VALUES (?, ?)", (status, id_cliente, ))
+        cur.execute("INSERT INTO pedido (status, id_cliente, ped_valor, ped_qtd) VALUES (?, ?, ?, ?)", (status, nome, ped_valor, ped_qtd, ))
         id_pedido = cur.lastrowid
         con.commit()
         return id_pedido
@@ -334,7 +349,7 @@ def consultar_pedido(id_pedido):
 
 def listar_pedidos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT p.id_pedido, p.id_cliente, p.datahora, p.status FROM pedido p ORDER BY p.id_cliente")
+        cur.execute("SELECT p.id_pedido, p.id_cliente, p.datahora, p.status, c.nome FROM pedido p INNER JOIN cliente c ON p.id_cliente = c.id_cliente ORDER BY p.id_cliente")
         return rows_to_dict(cur.description, cur.fetchall())
 
 def editar_pedido(status, id_pedido):
@@ -365,16 +380,21 @@ def consultar_usuario(usuario):
             return None
         return Usuario(u['id_usuario'], u['usuario'], u['email'], u['senha'])
 
-#--------------------PRODUTO PEDIDO------------------#
-
-def criar_prod_pedido(preco, quantidade, id_produto, id_pedido): 
+#--------------------ITENS PEDIDO------------------#
+'''preco, quantidade, descricao, id_pedido, preco_unitario'''
+def criar_prod_pedido(preco, quantidade, descricao, id_pedido, preco_unitario, id_produto): 
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO produto_pedido (preco, quantidade, id_produto, id_pedido) VALUES (?, ?, ?, ?)", (preco, quantidade, id_produto, id_pedido, ))
+        cur.execute("INSERT INTO itens_pedido (i.preco, i.quantidade, p.descricao, i.id_pedido, i.id_produto) SELECT (?, ?, ?, ?, ?) FROM itens_pedido i LEFT JOIN produto p WHERE p.id_produto = i.id_produto", ())
         con.commit()
 
 def consultar_prod_pedido(id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT preco, quantidade, id_produto, id_pedido FROM produto_pedido p WHERE id_pedido = ?", (id_pedido, ))
+        cur.execute("SELECT preco, quantidade, id_produto, id_pedido FROM itens_pedido p WHERE id_pedido = ?", (id_pedido, ))
+        return row_to_dict(cur.description, cur.fetchone())
+
+def listar_itens_pedido():
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("SELECT i.preco, i.quantidade, i.id_produto, i.id_pedido, i.preco_unitario, p.descricao from itens_pedido i INNER JOIN produto p ON i.id_produto= p.id_produto")
         return row_to_dict(cur.description, cur.fetchone())
 
 ########################
