@@ -15,11 +15,16 @@
             const id_produto = document.getElementById('id_produto')
             const id_pedido = document.getElementById('id_pedido')
 
-            if (preco.value == "" || preco.value < 0) {
+            if (preco_unitario.value == "" || preco_unitario.value < 0) {
                 alert("Preço incorreto!");
                 return false;
             }
             
+            if (preco.value == "" || preco.value < 0) {
+                alert("Preço incorreto!");
+                return false;
+            }
+
             if (quantidade.value == "" || quantidade.value < 0) {
                 alert("Quantidade não pode ser menor que zero");
                 return false;
@@ -49,7 +54,29 @@
             };
             xhr.send();
         }
+
+
+    function duplicarCampos(){
+	    var clone = document.getElementById('descricao').cloneNode(true);
+	    var destino = document.getElementById('destino');
+	    destino.appendChild (clone);
+	
+	var camposClonados = clone.getElementsByTagName('input');
+	
+	for(i=0; i<camposClonados.length;i++){
+		camposClonados[i].value = '';
+	}
+	
+	
+	
+}
+
+function removerCampos(id){
+	var node1 = document.getElementById('destino');
+	node1.removeChild(node1.childNodes[0]);
+}
     </script>
+    
 </head>
 
 <body>
@@ -58,15 +85,16 @@
        
         <!-- Form Name -->
         <legend>Cadastro de Produtos pedidos</legend>
-        <!-- Text input-->
+        <!-- Text input-->       
         <div class="form-group">
             <label class="col-md-4 control-label" for="descricao">Produto:</label>
             <div class="col-md-2">
                 <select class="form-control" name="descricao" id="descricao">
                 {% for produto in produtos %}
                     <option value="{{produto['id_produto']}}" {% if id_produto == produto['id_produto'] %}selected="selected"{% endif %}>{{produto['descricao']}}</option>
+                    <div id="destino"></div>
                 {% endfor %}
-            </select>
+                </select>
             </div>
         </div>
 
@@ -81,38 +109,35 @@
             </div>
         </div>
         
-        
-        <script type="text/javascript"> 
-            preco_unitario = getElementById("preco_unitario");
-            quantidade = getElementById("quantidade");
-                function calcula_preco(preco_unitario, quantidade) {
-                    res = preco_unitario * quantidade;
-                    return res;
-                    
-                }
-    
-        </script>
-
         <div class="form-group">
             <label class="col-md-4 control-label" for="preco_unitario">Preço Unitario</label>
             <div class="col-md-2">
-                <input id="preco_unitario" name="preco_unitario" type="number" placeholder="" class="form-control input-md" value="{{preco}}">
+                <input id="preco_unitario" name="preco_unitario" type="text" placeholder="" class="form-control input-md" onkeyup="calcula_preco()" value="{{preco}}">
             </div>
         </div>
 
         <div class="form-group">
             <label class="col-md-4 control-label" for="quantidade">Quantidade</label>
             <div class="col-md-2">
-                <input id="quantidade" name="quantidade" type="number" placeholder="" class="form-control input-md" value="{{quantidade}}">
+                <input id="quantidade" name="quantidade" type="text" placeholder="" class="form-control input-md" onkeyup="calcula_preco()" value="{{quantidade}}">
             </div>
         </div>
         
         <div class="form-group">
             <label class="col-md-4 control-label" for="preco">Preço Total</label>
             <div class="col-md-2">
-                <input id="preco" name="preco" type="number" placeholder="" class="form-control input-md" value="{{"calcula_preco()"}}">
+                <input id="preco" name="preco" type="text" placeholder="" class="form-control input-md" value="">
             </div>
         </div>
+        <!-- Função auto soma -->
+        <script type="text/javascript">
+        function calcula_preco() { 
+            let v1 = parseInt(document.getElementById("preco_unitario").value) || 0;
+            let v2 = parseInt(document.getElementById("quantidade").value) || 0;
+             document.getElementById("preco").value = v1 * v2;
+                }
+            window.onload = (function() { calcula_preco() });
+        </script>
 
         <!-- Button (Double) -->
         <div class="form-group">

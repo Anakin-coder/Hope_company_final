@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     datahora DEFAULT CURRENT_DATE,
     ped_valor INTEGER,
     ped_qtd INTERGER,
-    status TINYINT(1),
+    status VARCHAR(20),
     FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
 );
 
