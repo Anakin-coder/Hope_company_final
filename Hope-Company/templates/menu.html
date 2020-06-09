@@ -6,7 +6,8 @@
   <title>{%block title%}Hope Company{% endblock %}</title>
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous">
-   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+   
     <style>
         .custom-restricted-width {
             /* To limit the menu width to the content of the menu: */
@@ -27,25 +28,24 @@
         }
         .pure-menu{
             height: 100%;
-            position: fixed;
+            position: absolute;
         }
         .pure-menu-item {
             padding: 1px;
             
         }
-        aside {
-            position: relative;
+        section {
             float: right;
-            top: 0;
-            left: 0;
-            width: 1165px;
-            padding: 2px;
         }
+
     </style>
+
 {% endblock %}
+
 
 <header>
     {% block navbar %}
+
     <div class="pure-menu custom-restricted-width">
         <span class="pure-menu-heading">Hope Company</span>
         <ul class="pure-menu-list">
@@ -68,26 +68,34 @@
                 <a href="/produto/novo" class="pure-menu-link">Cadastrar Produto</a>
             </li>
             <li class="pure-menu-item">
-                <a href="/pedido/novo" class="pure-menu-link">Realizar Pedido</a>
+                <a href="/pedido/novo/" class="pure-menu-link">Realizar Pedido</a>
             </li>
             <li class="pure-menu-item">
                 <a href="/produto/pedido" class="pure-menu-link">Pedir Produto</a>
+            </li>
+            <li class="pure-menu-item">
+                <a href="/pedido/novo/confirma-pedido/" class="pure-menu-link">Confirma Pedido</a>
             </li>
             <li class="pure-menu-item">
                 <a href="/" class="pure-menu-link">Sair</a>
             </li>
         </ul>
     </div>
+    
 </header>
 {% endblock %}
 
 <body>
+    
     {% block body%}
-        <aside>
+        <section>
             {% block content%}
-
+            
             {% endblock %}
-        </aside>
+        </section>
+        
+       
     {% endblock %}
+        
 </body>
 </html>

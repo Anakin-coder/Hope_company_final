@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Pedido</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script type="text/javascript">
+
+         function confirmar(){
+            document.getElementById("form_principal").submit();
+
+         }   
+
+
+        function excluir() {
+            if (!confirm("Você tem certeza?")) return;
+            xhr = new XMLHttpRequest();
+            xhr.open('DELETE', '/pedido/' + id_pedido);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status === 200 || xhr.status === 404) {
+                    document.open();
+                    document.write(xhr.responseText);
+                    document.close();
+                } else {
+                    alert('Erro ' + xhr.status);
+                }
+            };
+            xhr.send();
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <form class="form-horizontal" action="/pedido/confirmar/{{id_pedido}}" method="POST" id="form_principal">
+
+    <div class="container">
+    <div class="table table-sm" id="sailorTableArea">
+        <table id="sailorTable" class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Pedido</th>
+                    <th>Cliente</th>
+                    <th>Produto</th>
+                    <th>Quantidade em estoque</th>
+                    <th>Valor</th>
+                    <th>Quantidade pedida</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in produtos %}
+                <tr>
+                    <td><input type="hidden" value="{{id_pedido}}" name="id_pedido"/>{{id_pedido}}</td>
+                    <td>{{cliente}}</td>
+                    <td>{{p[1]}}</td>
+                    <td>{{p[2]}}</td>
+                    <td>{{p[3]}}</td>
+                    <td>{{p[4]}}</td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{total}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+    <style>
+        a{
+            color:white;
+        }
+    </style>
+    
+    <div class="container">
+        <div class="form-group col-md-2">
+            <label for="cliente">Pagamento:</label>
+                <select class="form-control" name="cliente" id="cliente">
+                    <option>Pago</option>
+                    <option>Pendente</option>
+            </select>
+            </div>
+        </div>
+    
+    <div class="text-center">
+        <button type="button" class="btn btn-success" id = "S" onclick="javascript:confirmar();">Confirmar Pedido</button>
+        <button type="button" class="btn btn-danger" id = "N"><a href="/menu">Voltar</a></button>
+    </div>
+    </form>
+</body>
+        
+
+</html>

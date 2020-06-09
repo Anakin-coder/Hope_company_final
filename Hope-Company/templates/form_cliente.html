@@ -49,14 +49,12 @@
     <form class="form-horizontal" action="/cliente/{{id_cliente}}/" method="POST" id="form_principal">
         {% if id_cliente != 'novo'%}
         <p>
-            <label>Id:</label> {{id_cliente}}
+            <label>Cadastro de Clientes</label> {{id_cliente}}
         </p>
         {% endif %}
-
-        <!-- Form Name -->
-        <legend>Cadastro de Clientes</legend>
-        <!-- Text input-->
-
+         <!-- Form Name -->
+         <legend>Cadastro de Clientes</legend>
+         <!-- Text input-->
         <div class="form-group">
             <label class="col-md-4 control-label" for="nome">Nome:</label>
             <div class="col-md-2">

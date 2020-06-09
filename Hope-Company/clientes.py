@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template, session, redirect
 from entities.usuario import Usuario
 from entities.produtos import Produto
 from entities.pedido import Pedido
 from contextlib import closing
+import re
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -139,16 +140,26 @@ def listar_pedidos_api():
 
 @app.route("/pedido/novo/", methods = ["GET"])
 def form_criar_pedido_api():
-    return render_template("form_pedido.html", id_pedido = "novo", status = "",  nome = "", ped_valor = "", ped_qtd = "", clientes = listar_clientes(), produtos = listar_produtos())
+    return render_template("form_pedido.html", id_pedido = "novo", clientes = listar_clientes())
 
 @app.route("/pedido/novo/", methods = ["POST"])
-def criar_pedido_api():
-    status = request.form["status"]
-    nome = request.form["nome"]
-    ped_valor = request.form["ped_valor"]
-    ped_qtd = request.form["ped_qtd"]
-    id_pedido = criar_pedido(status, nome, ped_valor, ped_qtd)
-    return render_template("menu.html", mensagem = f"Novo pedido gerado: {id_pedido}!")
+def realiza_pedido_api():
+    cliente = request.form["cliente"]
+    pedido = "{}".format(request.form["pedido"])
+    lista_ped = separaPedido(pedido)
+    prod_id = retorna_id_produto(lista_ped)
+    produto = consultar_produto_pedido(prod_id)
+    quantidade = retorna_quant_produto(lista_ped)
+    res = add_quantidade(produto, quantidade)
+    total = preco_venda(soma_total(res))
+    return render_template("confirma_pedido.html", id_pedido = "novo", cliente = cliente,  produtos = res, quantidade = quantidade, total = total)
+
+
+@app.route("/pedido/confirmar/novo", methods = ["POST"])
+def confirma_pedido_api():
+    print("oi pessoal boa tarde"+str(request.form))
+    return render_template("menu.html")
+
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["GET"])
 def form_alterar_pedido_api(id_pedido):
@@ -173,6 +184,61 @@ def deletar_pedido_api(id_pedido):
         return render_template("menu.html", mensagem = "Esse pedido nem mesmo existia mais."), 404
     deletar_pedido(id_pedido)
     return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi excluído com sucesso!")
+#------------------FUNÇÕES AUXILIARES----------------#
+def separaPedido(texto):
+    lista = []
+    for linha in texto.split("' '"):
+        lista.append(linha)
+        for i in range(len(lista)):
+            novalista = lista[i].split("\r\n")
+    x = 0
+    dic = {}
+    outralista = []
+    while x < len(novalista):
+        dic["id"] = novalista[x][0:1]
+        dic["quantidade"] = novalista[x][2:]
+        outralista.append(dic.copy())
+        x += 1
+    return outralista
+
+def retorna_id_produto(lista_ped):
+    x = 0
+    id = []
+    while x < len(lista_ped):
+        id.append(lista_ped[x]["id"])
+        x+=1
+    return id
+
+def retorna_quant_produto(lista_ped):
+    x = 0
+    quantidade = []
+    while x < len(lista_ped):
+        quantidade.append(lista_ped[x]["quantidade"])
+        x+=1
+    return quantidade
+
+def add_quantidade(produto, quantidade):
+    print(quantidade)
+    x = 0
+    lista_prod = []
+    res = []
+    while x < len(produto):
+        lista_prod = list(produto[x]).copy()
+        lista_quat = int(quantidade[x])
+        lista_prod.append(lista_quat)
+        res.append(lista_prod)
+        x += 1
+    return res
+
+def soma_total(res):
+    soma = 0
+    for total in res:
+        soma += total[3] * total[4]
+    return soma
+
+def preco_venda(preco_unitario):
+    preco_venda = preco_unitario * 2
+    return preco_venda
 #---------------------------------ITENS PEDIDO-----------------------------------------------#
 @app.route("/produto/pedido/", methods = ["GET"])
 def form_prod_pedido_api():
@@ -229,8 +295,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     id_cliente INTEGER NOT NULL,
     datahora DEFAULT CURRENT_DATE,
     ped_valor INTEGER,
-    ped_qtd INTERGER,
-    status VARCHAR(20),
+    status VARCHAR(20) DEFAULT "Pendente",
     FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
 );
 
@@ -335,9 +400,9 @@ def deletar_produto(id_produto):
 
 #-----------------------PEDIDOS-------------------------------#
 
-def criar_pedido(status, nome, ped_valor, ped_qtd): 
+def criar_pedido(cliente, total): 
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO pedido (status, id_cliente, ped_valor, ped_qtd) VALUES (?, ?, ?, ?)", (status, nome, ped_valor, ped_qtd, ))
+        cur.execute("INSERT INTO pedido (id_cliente, ped_valor) VALUES (?, ?)", (cliente, total, ))
         id_pedido = cur.lastrowid
         con.commit()
         return id_pedido
@@ -351,6 +416,12 @@ def listar_pedidos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("SELECT p.id_pedido, p.id_cliente, p.datahora, p.status, c.nome FROM pedido p INNER JOIN cliente c ON p.id_cliente = c.id_cliente ORDER BY p.id_cliente")
         return rows_to_dict(cur.description, cur.fetchall())
+
+def consultar_produto_pedido(id_produto):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        query = f"SELECT id_produto, descricao, quantidade, preco_unitario FROM produto WHERE id_produto in ({','.join(['?']*len(id_produto))})"
+        cur.execute(query, id_produto)
+        return cur.fetchall()
 
 def editar_pedido(status, id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
@@ -396,6 +467,7 @@ def listar_itens_pedido():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("SELECT i.preco, i.quantidade, i.id_produto, i.id_pedido, i.preco_unitario, p.descricao from itens_pedido i INNER JOIN produto p ON i.id_produto= p.id_produto")
         return row_to_dict(cur.description, cur.fetchone())
+
 
 ########################
 #### Inicialização. ####

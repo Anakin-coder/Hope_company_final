@@ -16,7 +16,7 @@
             const id_pedido = document.getElementById('id_pedido')
 
             if (preco_unitario.value == "" || preco_unitario.value < 0) {
-                alert("Preço incorreto!");
+                ("Preço incorreto!");
                 return false;
             }
             
@@ -55,26 +55,6 @@
             xhr.send();
         }
 
-
-    function duplicarCampos(){
-	    var clone = document.getElementById('descricao').cloneNode(true);
-	    var destino = document.getElementById('destino');
-	    destino.appendChild (clone);
-	
-	var camposClonados = clone.getElementsByTagName('input');
-	
-	for(i=0; i<camposClonados.length;i++){
-		camposClonados[i].value = '';
-	}
-	
-	
-	
-}
-
-function removerCampos(id){
-	var node1 = document.getElementById('destino');
-	node1.removeChild(node1.childNodes[0]);
-}
     </script>
     
 </head>
@@ -84,7 +64,7 @@ function removerCampos(id){
     <form class="form-horizontal" method="POST" action="/produto/pedido/" id="form_principal">
        
         <!-- Form Name -->
-        <legend>Cadastro de Produtos pedidos</legend>
+        <legend>Cadastro de Produtos Pedidos</legend>
         <!-- Text input-->       
         <div class="form-group">
             <label class="col-md-4 control-label" for="descricao">Produto:</label>
@@ -143,7 +123,7 @@ function removerCampos(id){
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Confirmar Pedido</button> 
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
 
             </div>

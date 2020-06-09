@@ -3,6 +3,7 @@
 
 
 {% block content %}
+<div class="container col-md-18">
     <div class="table-responsive" id="sailorTableArea">
         <table id="sailorTable" class="table table-striped table-bordered" width="100%">
             <thead>
@@ -19,14 +20,15 @@
                         <tr>
                             <td>{{produto['id_produto']}}</td>
                             <td>{{produto['descricao']}}</td>
-                            <td>{{produto['quantidade']}}</td>
-                            <td>{{produto['preco_unitario']}}</td>
+                            <td>{{produto['quantidade']}} Un</td>
+                            <td>R$ {{produto['preco_unitario']}}</td>
                             <td><a href="/produto/{{produto['id_produto']}}" class="botao">Editar</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
         </table>
     </div>
+</div>
     <div class="form-group">
         <label class="col-md-4 control-label" for="btnsalvar"></label>
         <div class="col-md-8 text-right">

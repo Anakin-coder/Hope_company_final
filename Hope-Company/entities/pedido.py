@@ -7,11 +7,5 @@ class Pedido(Cliente):
         self.quantidade = quantidade
         self.datahora = datahora
         self.status = status
-    
 
-    def realiza_pedido(self, items):
-        pedidos = []
-        pedidos.append(items)
-        for pedido in pedidos:
-            return pedido
     

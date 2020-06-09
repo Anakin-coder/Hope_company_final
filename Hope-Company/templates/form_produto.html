@@ -65,13 +65,12 @@
     <form class="form-horizontal" action="/produto/{{id_produto}}/" method="POST" id="form_principal">
         {% if id_produto != 'novo'%}
         <p>
-            <label>Id:</label> {{id_produto}}
+            <label>Cadastro de Produtos:</label> {{id_produto}}
         </p>
         {% endif %}
         <!-- Form Name -->
         <legend>Cadastro de Produtos</legend>
         <!-- Text input-->
-
         <div class="form-group">
             <label class="col-md-4 control-label" for="descricao">Descrição</label>
             <div class="col-md-2">
