@@ -32,8 +32,9 @@
             xhr.send();
         }
 
+       
     </script>
-
+ 
 </head>
 
 <body>
@@ -57,12 +58,12 @@
                 {% for p in produtos %}
                 <tr>
                     <td><input type="hidden" value="{{id_pedido}}" name="id_pedido"/>{{id_pedido}}</td>
-                    <td>{{cliente}}</td>
-                    <td>{{p[1]}}</td>
-                    <td>{{p[2]}}</td>
-                    <td>{{p[3]}}</td>
-                    <td>{{p[4]}}</td>
-                    <td></td>
+                    <td><input type="hidden" value="{{cliente}}" name="cliente"/>{{cliente}}</td>
+                    <td><input type="hidden" id="produto" value="{{p[1]}}" name="produto">{{p[1]}}</td>
+                    <td><input type="hidden" id="quantidade_estoque" value="{{p[2]}}" name="quantidade_estoque">{{p[2]}}</td>
+                    <td><input type="hidden" id="valor" value="{{p[3]}}" name="valor" onkeyup="calcula_preco()"/>{{p[3]}}</td>
+                    <td><input type="hidden" id="quantidade_pedida" value="{{p[4]}}" name="quantidade" onkeyup="calcula_preco()">{{p[4]}}</td>
+                    <td><input type="hidden" id="id_produto" value="{{prod_id}}" name="id_produto"></td>
                 </tr>
                 {% endfor %}
                 <tr>
@@ -72,7 +73,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td>{{total}}</td>
+                    <td><input type="hidden" id="total" value="{{total}}" name="total"/>{{total}}</td>
                 </tr>
             </tbody>
         </table>
@@ -82,12 +83,24 @@
         a{
             color:white;
         }
+        #total{
+            box-shadow: none;
+            border-width: 0px;
+        }
+        #valor{
+            box-shadow:none;
+            border-width: 0px;
+        }
+        #quantidade{
+            box-shadow:none;
+            border-width: 0px;
+        }
     </style>
     
     <div class="container">
         <div class="form-group col-md-2">
             <label for="cliente">Pagamento:</label>
-                <select class="form-control" name="cliente" id="cliente">
+                <select class="form-control" name="pagamento" id="pagamento">
                     <option>Pago</option>
                     <option>Pendente</option>
             </select>

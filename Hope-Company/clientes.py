@@ -3,7 +3,6 @@ from entities.usuario import Usuario
 from entities.produtos import Produto
 from entities.pedido import Pedido
 from contextlib import closing
-import re
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -11,7 +10,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 #### Definições da API. ####
 ############################
 app = Flask(__name__)
-
 #---------------------------------LOGIN-----------------------------------------------#
 
 @app.route("/", methods = ["GET"])
@@ -26,7 +24,7 @@ def login_api():
     if u is None:
         return render_template('login.html', mensagem = 'Usuário não está cadastrado')
     if u.verifica_senha(senha):
-        return render_template("menu.html", mensagem = f"Bem vindo, {nome}")
+        return render_template("menu.html", mensagem = "Bem vindo, {}".format(str(nome).capitalize()))
     return render_template('login.html', mensagem = 'Senha incorreta')
 
 #---------------------------------CADASTRO DE NOVO USUARIO-----------------------------------------------#
@@ -103,7 +101,8 @@ def criar_produto_api():
     descricao = request.form["descricao"]
     quantidade = request.form["quantidade"]
     preco_unitario = request.form["preco_unitario"]
-    id_produto = criar_produto(descricao, quantidade, preco_unitario)
+    id_produto = criar_produto(descricao, preco_unitario)
+    cadastra_prod_estoque(id_produto, quantidade)
     return render_template("menu.html", mensagem = f"Novo produto criado: {id_produto}.")
 
 @app.route("/produto/<int:id_produto>/", methods = ["GET"])
@@ -130,6 +129,7 @@ def deletar_produto_api(id_produto):
     if produto == None:
         return render_template("menu.html", mensagem = "Esse produto nem mesmo existia mais."), 404
     deletar_produto(id_produto)
+    #deletar_produto_estoque(id_produto)
     return render_template("menu.html", mensagem = f"O produto {produto['descricao']} com o id {id_produto} foi excluído.")
 
 #---------------------------------PEDIDO-----------------------------------------------#
@@ -152,13 +152,27 @@ def realiza_pedido_api():
     quantidade = retorna_quant_produto(lista_ped)
     res = add_quantidade(produto, quantidade)
     total = preco_venda(soma_total(res))
-    return render_template("confirma_pedido.html", id_pedido = "novo", cliente = cliente,  produtos = res, quantidade = quantidade, total = total)
+    return render_template("confirma_pedido.html", id_pedido = "novo", cliente = cliente,  produtos = res, quantidade = quantidade, total = total, prod_id = prod_id)
 
 
 @app.route("/pedido/confirmar/novo", methods = ["POST"])
 def confirma_pedido_api():
-    print("oi pessoal boa tarde"+str(request.form))
-    return render_template("menu.html")
+    id_pedido = request.form["cliente"]
+    cliente = request.form ["cliente"]
+    produto = request.form.getlist("produto")
+    quantidade_estoque = request.form.getlist("quantidade_estoque")
+    quantidade_pedida = request.form.getlist("quantidade")
+    status = request.form["pagamento"]
+    total = request.form["total"]
+    preco_un = request.form["valor"]
+    id_produto = request.form["id_produto"]
+    id_pedido = criar_pedido(cliente, total, status)
+    id_produto = int(id_produto[2])
+    x = 0
+    while x < len(produto):
+        atualiza_quantidade(id_produto, quantidade_pedida[x])
+        x += 1
+    return render_template("menu.html", mensagem = "")
 
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["GET"])
@@ -218,7 +232,6 @@ def retorna_quant_produto(lista_ped):
     return quantidade
 
 def add_quantidade(produto, quantidade):
-    print(quantidade)
     x = 0
     lista_prod = []
     res = []
@@ -237,7 +250,7 @@ def soma_total(res):
     return soma
 
 def preco_venda(preco_unitario):
-    preco_venda = preco_unitario * 2
+    preco_venda = preco_unitario * 1
     return preco_venda
 #---------------------------------ITENS PEDIDO-----------------------------------------------#
 @app.route("/produto/pedido/", methods = ["GET"])
@@ -295,7 +308,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     id_cliente INTEGER NOT NULL,
     datahora DEFAULT CURRENT_DATE,
     ped_valor INTEGER,
-    status VARCHAR(20) DEFAULT "Pendente",
+    status VARCHAR(20),
     FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
 );
 
@@ -312,7 +325,6 @@ CREATE TABLE IF NOT EXISTS itens_pedido (
 CREATE TABLE IF NOT EXISTS produto (
     id_produto INTEGER PRIMARY KEY AUTOINCREMENT,
     descricao VARCHAR(50) NOT NULL,
-    quantidade INTEGER,
     preco_unitario REAl NOT NULL
 );
 
@@ -371,9 +383,9 @@ def deletar_cliente(id_cliente):
 
 #--------------------PRODUTO------------------------#    
 
-def criar_produto(descricao, quantidade, preco_unitario):
+def criar_produto(descricao, preco_unitario):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO produto (descricao, quantidade, preco_unitario) values(?, ?, ?)", (descricao, quantidade, preco_unitario))
+        cur.execute("INSERT INTO produto (descricao, preco_unitario) values(?, ?)", (descricao, preco_unitario))
         id_produto = cur.lastrowid
         con.commit()
         return id_produto
@@ -385,7 +397,7 @@ def consultar_produto(id_produto):
 
 def listar_produtos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT p.id_produto, p.descricao, p.preco_unitario, p.quantidade FROM produto p ORDER BY p.id_produto")
+        cur.execute("SELECT p.id_produto, p.descricao, p.preco_unitario, e.quantidade FROM produto p INNER JOIN estoque e ON p.id_produto = e.id_produto ORDER BY p.id_produto")
         return rows_to_dict(cur.description, cur.fetchall())
         
 def editar_produto(id_produto, descricao, quantidade, preco_unitario):
@@ -397,12 +409,28 @@ def deletar_produto(id_produto):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("DELETE FROM produto WHERE id_produto = ?", (id_produto, ))
         con.commit()
-
-#-----------------------PEDIDOS-------------------------------#
-
-def criar_pedido(cliente, total): 
+#--------------------ESTOQUE------------------------#    
+def cadastra_prod_estoque(id_produto, quantidade):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO pedido (id_cliente, ped_valor) VALUES (?, ?)", (cliente, total, ))
+        cur.execute(f"INSERT INTO estoque (id_produto, quantidade) SELECT {id_produto}, {quantidade} FROM produto p WHERE NOT EXISTS (SELECT 1 FROM estoque e WHERE p.id_produto = e.id_produto)")
+        id_estoque = cur.lastrowid
+        con.commit()
+        return id_estoque
+
+def verifica_quantidade(id_produto):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute(f"SELECT quantidade FROM estoque WHERE id_produto = {id_produto}")
+        return row_to_dict(cur.description, cur.fetchone())
+
+def atualiza_quantidade(id_produto, quantidade_pedida):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("UPDATE estoque SET quantidade = quantidade - ? WHERE id_produto = ?", (quantidade_pedida, id_produto, ))
+        con.commit()
+#--------------------PEDIDOS-----------------------#
+
+def criar_pedido(id_cliente, total, status): 
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("INSERT INTO pedido (id_cliente, ped_valor, status) VALUES (?, ?, ?)", (id_cliente, total, status))
         id_pedido = cur.lastrowid
         con.commit()
         return id_pedido
@@ -419,7 +447,7 @@ def listar_pedidos():
 
 def consultar_produto_pedido(id_produto):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        query = f"SELECT id_produto, descricao, quantidade, preco_unitario FROM produto WHERE id_produto in ({','.join(['?']*len(id_produto))})"
+        query = f"SELECT p.id_produto, p.descricao, e.quantidade, p.preco_unitario FROM produto p INNER JOIN estoque e ON e.id_produto = p.id_produto WHERE p.id_produto in ({','.join(['?']*len(id_produto))})"
         cur.execute(query, id_produto)
         return cur.fetchall()
 
