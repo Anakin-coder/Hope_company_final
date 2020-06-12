@@ -28,7 +28,7 @@
                 return false;
             }
 
-            if (quantidade.value == "") {
+            if (quantidade.value == "" || quantidade.value < 0) {
                 alert("Preencha a quantidade.");
                 return false;
             }
