@@ -9,9 +9,9 @@
                 <tr>
                     <th>Pedido</th>
                     <th>Cliente</th>
-                    <th>Produto</th>
                     <th>Data de Pedido</th>
                     <th>Status</th>
+                    <th></th>
                     <th></th>
                 </tr>
             </thead>
@@ -20,10 +20,10 @@
                 <tr>
                     <td>{{pedido['id_pedido']}}</td>
                     <td>{{pedido['nome']}}</td>
-                    <td></td>
                     <td>{{pedido['datahora']}}</td>
                     <td>{{pedido['status']}}</td>
                     <td><a href="/pedido/{{pedido['id_pedido']}}" class="botao">Editar</a></td>
+                    <td><a href="/pedido/visualizar" class="botao">Visualizar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

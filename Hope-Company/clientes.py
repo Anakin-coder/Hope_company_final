@@ -120,7 +120,8 @@ def alterar_produto_api(id_produto):
     produto = consultar_produto(id_produto)
     if produto == None:
         return render_template("menu.html", mensagem = f"Esse produto não existe."), 404
-    editar_produto(id_produto, descricao, quantidade, preco_unitario)
+    editar_produto(id_produto, descricao, preco_unitario)
+    editar_produto_estoque(id_produto, quantidade)
     return render_template("menu.html", mensagem = f"O produto {id_produto} foi editado com sucesso!")
 
 @app.route("/produto/<int:id_produto>", methods = ["DELETE"])
@@ -392,7 +393,7 @@ def criar_produto(descricao, preco_unitario):
 
 def consultar_produto(id_produto):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT id_produto, descricao, preco_unitario FROM produto WHERE id_produto = ?", (id_produto, ))
+        cur.execute("SELECT p.id_produto, p.descricao, p.preco_unitario, e.quantidade FROM produto p INNER JOIN estoque e ON e.id_produto = p.id_produto WHERE p.id_produto = ?", (id_produto, ))
         return row_to_dict(cur.description, cur.fetchone())
 
 def listar_produtos():
@@ -400,9 +401,9 @@ def listar_produtos():
         cur.execute("SELECT p.id_produto, p.descricao, p.preco_unitario, e.quantidade FROM produto p INNER JOIN estoque e ON p.id_produto = e.id_produto ORDER BY p.id_produto")
         return rows_to_dict(cur.description, cur.fetchall())
         
-def editar_produto(id_produto, descricao, quantidade, preco_unitario):
+def editar_produto(id_produto, descricao, preco_unitario):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE produto SET descricao = ?, quantidade = ?, preco_unitario = ? WHERE id_produto = ?", (descricao, quantidade, preco_unitario, id_produto))
+        cur.execute("UPDATE produto SET descricao = ?, preco_unitario = ? WHERE id_produto = ?", (descricao, preco_unitario, id_produto))
         con.commit()
 
 def deletar_produto(id_produto):
@@ -431,6 +432,11 @@ def deletar_produto_estoque(id_produto):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("DELETE FROM estoque WHERE id_produto = ?", (id_produto, ))
         con.commit()
+
+def editar_produto_estoque(id_produto, quantidade):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("UPDATE estoque SET quantidade = ? WHERE id_produto = ?", (quantidade, id_produto))
+        con.commit()
 #--------------------PEDIDOS-----------------------#
 
 def criar_pedido(id_cliente, total, status): 
@@ -447,7 +453,7 @@ def consultar_pedido(id_pedido):
 
 def listar_pedidos():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT p.id_pedido, p.id_cliente, p.datahora, p.status, c.nome, i.id_produto FROM pedido p INNER JOIN cliente c ON p.id_cliente = c.id_cliente INNER JOIN itens_pedido i ON i.id_pedido = p.id_pedido ORDER BY p.id_cliente")
+        cur.execute("SELECT p.id_pedido, c.nome, p.datahora, p.status FROM pedido p INNER JOIN cliente c ON p.id_cliente = c.id_cliente  ORDER BY p.id_cliente")
         return rows_to_dict(cur.description, cur.fetchall())
 
 def consultar_produto_pedido(id_produto):
