@@ -198,10 +198,18 @@ def edita_pedido(id_pedido, id_produto):
 
 @app.route("/edita-pedido/<int:id_pedido>/<int:id_produto>/", methods = ["POST"])
 def alterar_itens_pedido_api(id_pedido, id_produto):
+    prod_pedido = consultar_itens_pedido(id_pedido, id_produto)
+    quantidade = prod_pedido["quantidade"]
     id_produto = request.form["id_produto"]
-    quantidade = request.form["quantidade"]
+    quantidade_atual = request.form["quantidade"]
     preco = request.form["preco_unitario"]
-    editar_prod_pedido(id_produto, quantidade, preco, id_pedido)
+    if int(quantidade_atual) > int(quantidade):
+        quantidade_atual = int(quantidade_atual) - quantidade
+        atualiza_quantidade(id_produto, quantidade_atual)
+    elif int(quantidade_atual) < int(quantidade):
+        quantidade = quantidade - int(quantidade_atual)
+        editar_produto_pedido(id_produto, quantidade)
+    editar_prod_pedido(id_produto, quantidade_atual, preco, id_pedido)
     return render_template("menu.html", mensagem = f"O pedido {id_pedido} com o produto {id_produto} foi editado com sucesso!")
 
 @app.route("/edita-pedido/<int:id_pedido>/<int:id_produto>/", methods = ["DELETE"])
@@ -461,6 +469,11 @@ def editar_produto_estoque(id_produto, quantidade):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("UPDATE estoque SET quantidade = ? WHERE id_produto = ?", (quantidade, id_produto))
         con.commit()
+
+def editar_produto_pedido(id_produto, quantidade_atual):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute(f"UPDATE estoque SET quantidade = quantidade + {quantidade_atual} WHERE id_produto = {id_produto}")
+        con.commit()
 #--------------------PEDIDOS-----------------------#
 
 def criar_pedido(id_cliente, total, status): 
@@ -486,9 +499,9 @@ def consultar_produto_pedido(id_produto):
         cur.execute(query, id_produto)
         return cur.fetchall()
 
-def editar_prod_pedido(id_produto, quantidade, preco, id_pedido):
+def editar_prod_pedido(id_produto, quantidade_atual, preco, id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE itens_pedido SET preco_unitario = ?, quantidade = ?, id_produto = ? WHERE id_pedido = ? AND id_produto = ?", (preco, quantidade, id_produto, id_pedido, id_produto))
+        cur.execute("UPDATE itens_pedido SET preco_unitario = ?, quantidade = ?, id_produto = ? WHERE id_pedido = ? AND id_produto = ?", (preco, quantidade_atual, id_produto, id_pedido, id_produto))
         con.commit()
 
 def editar_pedido(status, id_pedido):
@@ -545,6 +558,21 @@ def listar_itens_pedido():
         cur.execute("SELECT i.quantidade, i.id_produto, i.id_pedido, i.preco_unitario from itens_pedido i")
         return rows_to_dict(cur.description, cur.fetchall())
 
+#----------------------PAGE ERRO---------------#
+
+@app.errorhandler(400)
+def requisicao_invalida(e):
+    return render_template('erro.html'), 400
+
+@app.errorhandler(404)
+def nao_encontrato(e):
+    return render_template('erro.html'), 404
+
+
+'''def create_app(config_filename):
+    app = Flask(__name__)
+    app.register_error_handler(400, page_not_found)
+    return app'''
 
 ########################
 #### Inicialização. ####

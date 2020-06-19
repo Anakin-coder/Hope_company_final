@@ -19,13 +19,13 @@
         {% for p in produtos %}
         var quantidade_estoque = parseInt(document.querySelector("input[value='{{p[2]}}']").value)
         var quantidade_pedida = parseInt(document.querySelector("input[value='{{p[4]}}']").value)
-        {% endfor %}
         if (quantidade_pedida > quantidade_estoque){
             alert("Produto indisponível")
             return false;
         }
+        {% endfor %}
         return true;
-        }
+    }
     </script>
  
 </head>

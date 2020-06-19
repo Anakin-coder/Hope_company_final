@@ -21,8 +21,8 @@
                     <th>{{id_pedido}}</th>
                     <th><input type="hidden" value="{{pedido['id_produto']}}" name="id_produto" id="id_produto"/>{{pedido['id_produto']}}</th>
                     <th>{{pedido['descricao']}}</th>
-                    <th>{{pedido['preco_unitario']}}</th>
-                    <th>{{pedido['quantidade']}}</th>
+                    <th>R$ {{pedido['preco_unitario']}}</th>
+                    <th>{{pedido['quantidade']}} Un</th>
                     <td><a href="/edita-pedido/{{id_pedido}}/{{pedido['id_produto']}}" class="botao">Editar</a></td>
                 </tr>
                 {% endfor %}
