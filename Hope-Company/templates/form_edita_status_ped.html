@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edita Pedido</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script type="text/javascript">
+       const id_pedido = "{{id_pedido}}";
+       
+        function validar() {
+            const status = document.getElementById('status');
+            
+            if (status.value == "") {
+                alert("Preencha o status.");
+                return false;
+            }
+            return true;
+        }
+
+        function salvar() {
+            if (!validar()) return;
+            document.getElementById("form_principal").submit();
+        }
+
+</script>
+</head>
+
+<body>
+    
+    <form class="form-horizontal" action="/pedido/{{id_pedido}}/" method="POST" id="form_principal">
+        {% if id_pedido != novo %}
+        <p>
+            <label>Edita Pedido:</label> {{id_pedido}}
+        </p>
+        {% endif %}
+        <!-- Form Name -->
+        <legend>Edita Status</legend>
+        <!-- Text input-->
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="status">Status</label>
+            <div class="col-md-2">
+                <input id="status" name="status" type="text" placeholder="" class="form-control input-md" value="{{status}}">
+
+            </div>
+        </div>
+
+        <!-- Button (Double) -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="btnsalvar"></label>
+            <div class="col-md-8">
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
+
+            </div>
+        </div>
+</body>
+
+</html>

@@ -30,6 +30,11 @@
             return false
         }
 
+        if (senha_admin.value == "") {
+            alert("Digite a senha de segurança.");
+            return false
+        }
+
         if (senha.value.length < 4) {
             alert("Sua senha deve conter mais que quatro dígitos");
             return false
@@ -45,6 +50,16 @@
     function salvar() {
         if (!validar()) return;
         document.getElementById("login-form").submit();
+    }
+
+    function mostrarSenha() {
+        var tipo = document.getElementById("senha");
+        if(tipo.type == "password"){
+            tipo.type = "text";
+        }
+        else {
+            tipo.type = "password";
+        }
     }
 
 </script>
@@ -70,11 +85,18 @@
                             <div class="form-group">
                                 <label for="senha" class="text-dark">Senha:</label><br>
                                 <input href="/menu " type="password" name="senha" id="senha" class="form-control">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="mostrarSenha()">Mostrar Senha</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="senha_admin" class="text-dark">Chave de Segurança</label><br>
+                                <input href="/menu " type="password" name="senha_admin" id="senha_admin" class="form-control">
+                                <p>{{mensagem}}</p>
                             </div>
                             <div class="form-group">
                                 <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
                                 <a id="btncancelar" name="btncancelar" class="btn btn-dark" href="/">Cancelar</a>
                             </div>
+                            
                             </div>
                         </form>
                     </div>

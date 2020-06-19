@@ -9,30 +9,23 @@
     <script type="text/javascript">
 
          function confirmar(){
+            if(!validar_quantidade()) return false;
             document.getElementById("form_principal").submit();
+         } 
+        
 
-         }   
+    function validar_quantidade(){
 
-
-        function excluir() {
-            if (!confirm("Você tem certeza?")) return;
-            xhr = new XMLHttpRequest();
-            xhr.open('DELETE', '/pedido/' + id_pedido);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function() {
-                if (xhr.readyState !== 4) return;
-                if (xhr.status === 200 || xhr.status === 404) {
-                    document.open();
-                    document.write(xhr.responseText);
-                    document.close();
-                } else {
-                    alert('Erro ' + xhr.status);
-                }
-            };
-            xhr.send();
+        {% for p in produtos %}
+        var quantidade_estoque = parseInt(document.querySelector("input[value='{{p[2]}}']").value)
+        var quantidade_pedida = parseInt(document.querySelector("input[value='{{p[4]}}']").value)
+        {% endfor %}
+        if (quantidade_pedida > quantidade_estoque){
+            alert("Produto indisponível")
+            return false;
         }
-
-       
+        return true;
+        }
     </script>
  
 </head>
@@ -61,8 +54,8 @@
                     <td><input type="hidden" value="{{cliente}}" name="cliente"/>{{cliente}}</td>
                     <td><input type="hidden" id="produto" value="{{p[1]}}" name="produto">{{p[1]}}</td>
                     <td><input type="hidden" id="quantidade_estoque" value="{{p[2]}}" name="quantidade_estoque">{{p[2]}}</td>
-                    <td><input type="hidden" id="valor" value="{{p[3]}}" name="valor" onkeyup="calcula_preco()"/>{{p[3]}}</td>
-                    <td><input type="hidden" id="quantidade_pedida" value="{{p[4]}}" name="quantidade" onkeyup="calcula_preco()">{{p[4]}}</td>
+                    <td><input type="hidden" id="valor" value="{{p[3]}}" name="valor"/>{{p[3]}}</td>
+                    <td><input type="hidden" id="quantidade_pedida" value="{{p[4]}}" name="quantidade" >{{p[4]}}</td>
                     <td><input type="hidden" id="id_produto" value="{{prod_id}}" name="id_produto"></td>
                 </tr>
                 {% endfor %}
@@ -109,7 +102,7 @@
     
     <div class="text-center">
         <button type="button" class="btn btn-success" id = "S" onclick="javascript:confirmar();">Confirmar Pedido</button>
-        <button type="button" class="btn btn-danger" id = "N"><a href="/menu">Voltar</a></button>
+        <button type="button" class="btn btn-danger" id = "N"><a href="/pedido/novo/">Voltar</a></button>
     </div>
     </form>
 </body>

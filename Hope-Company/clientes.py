@@ -5,13 +5,13 @@ from entities.pedido import Pedido
 from contextlib import closing
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 ############################
 #### Definições da API. ####
 ############################
 app = Flask(__name__)
 #---------------------------------LOGIN-----------------------------------------------#
-
 @app.route("/", methods = ["GET"])
 def form_login():
     return render_template("login.html", usuario = "", senha = "")
@@ -31,20 +31,29 @@ def login_api():
 
 @app.route("/registrar/novo/", methods = ["GET"])
 def form_registrar_novo_usu_api():
-    return render_template("form_registrar_usu.html", id_usuario = "novo", email = "", usuario = "", senha = "")
+    return render_template("form_registrar_usu.html", id_usuario = "novo", email = "", usuario = "", senha = "",senha_admin="")
 
 @app.route("/registrar/novo/", methods = ["POST"])
 def criar_usuario_api():
+    chave_de_seguranca = "admin"
     email = request.form["email"]
     nome = request.form["usuario"]
     senha = request.form["senha"]
-    inserir_novo_usuario(email, nome, senha)
-    return render_template("menu.html", mensagem = "Cadastro efetuado com sucesso")
+    senha_admin = request.form["senha_admin"]
+    if senha_admin == chave_de_seguranca:
+        inserir_novo_usuario(email, nome, senha)
+        return render_template("menu.html", mensagem = "Cadastro efetuado com sucesso")
+    return render_template("form_registrar_usu.html", mensagem = "Chave de segurança inválida")
    
 #---------------------------------MENU-----------------------------------------------#
 @app.route("/menu/")
 def menu():
     return render_template("menu.html", mensagem = "")
+
+@app.route("/suporte/")
+def suporte():
+    return render_template("suporte.html", mensagem = "")
+
 
 #---------------------------------CLIENTES-----------------------------------------------#
 @app.route("/cliente/")
@@ -158,51 +167,71 @@ def realiza_pedido_api():
 
 @app.route("/pedido/confirmar/novo", methods = ["POST"])
 def confirma_pedido_api():
-    id_pedido = request.form["cliente"]
-    cliente = request.form ["cliente"]
+    id_pedido = request.form["id_pedido"]
+    cliente = request.form["cliente"]
     produto = request.form.getlist("produto")
-    quantidade_estoque = request.form.getlist("quantidade_estoque")
     quantidade_pedida = request.form.getlist("quantidade")
     status = request.form["pagamento"]
     total = request.form["total"]
-    preco_un = request.form["valor"]
+    preco_un = request.form.getlist("valor")
     id_produto = request.form["id_produto"]
+    id_produto = trataritem(id_produto)
     id_pedido = criar_pedido(cliente, total, status)
-    id_produto = int(id_produto[2])
     x = 0
     while x < len(produto):
-        atualiza_quantidade(id_produto, quantidade_pedida[x])
-        if quantidade_pedida[x] > quantidade_estoque[x]:
-            pedir = int(quantidade_pedida[x]) - int(quantidade_estoque[x])
-            criar_prod_pedido(id_produto, id_pedido, preco_un[x], pedir)
+        atualiza_quantidade(id_produto[x], quantidade_pedida[x])
+        criar_prod_pedido(id_produto[x], id_pedido, float(preco_un[x]), quantidade_pedida[x])
         x += 1
-    return render_template("menu.html", mensagem = "")
+    return render_template("menu.html", mensagem = f"Pedido com id {id_pedido} realizado com sucesso")
+    
+@app.route("/visualiza_pedido/<int:id_pedido>", methods = ["GET", "POST"])
+def form_visualiza_ped(id_pedido):
+    prod_pedido = consultar_prod_pedido(id_pedido)
+    if prod_pedido == None:
+        return render_template("menu.html", mensagem = f"Esse pedido não existe.")
+    return render_template("visualiza_pedido.html", id_pedido = id_pedido, pedidos = prod_pedido)
 
+@app.route("/edita-pedido/<int:id_pedido>/<int:id_produto>/", methods = ["GET"])
+def edita_pedido(id_pedido, id_produto):
+    prod_pedido = consultar_itens_pedido(id_pedido, id_produto)
+    return render_template("edita_pedido.html", id_pedido = id_pedido, id_produto = id_produto, quantidade = prod_pedido["quantidade"], preco_unitario = prod_pedido["preco_unitario"])
+
+@app.route("/edita-pedido/<int:id_pedido>/<int:id_produto>/", methods = ["POST"])
+def alterar_itens_pedido_api(id_pedido, id_produto):
+    id_produto = request.form["id_produto"]
+    quantidade = request.form["quantidade"]
+    preco = request.form["preco_unitario"]
+    editar_prod_pedido(id_produto, quantidade, preco, id_pedido)
+    return render_template("menu.html", mensagem = f"O pedido {id_pedido} com o produto {id_produto} foi editado com sucesso!")
+
+@app.route("/edita-pedido/<int:id_pedido>/<int:id_produto>/", methods = ["DELETE"])
+def deletar_itens_pedido_api(id_pedido, id_produto):
+    deletar_prod_pedido(id_pedido, id_produto)
+    return render_template("menu.html", mensagem = f"O pedido {id_pedido} com o produto {id_produto} foi excluído com sucesso!")
+
+@app.route("/edita-pedido/<int:id_pedido>", methods = ["DELETE"])
+def deletar_pedido_api(id_pedido):
+    deletar_pedido(id_pedido)
+    deletar_prod_pedido(id_pedido, None)
+    return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi excluído com sucesso!")
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["GET"])
 def form_alterar_pedido_api(id_pedido):
     pedido = consultar_pedido(id_pedido)
     if pedido == None:
-        return render_template("menu.html", mensagem = f"Esse pedido não existe."), 404
-    return render_template("form_pedido.html", id_pedido = id_pedido, id_produto = pedido['id_produto'], quantidade = pedido['quantidade'], status = pedido['status'], preco = pedido['preco'], clientes = listar_clientes(), produtos = listar_produtos())
+        return render_template("menu.html", mensagem = f"Esse pedido não existe.")
+    return render_template("form_edita_status_ped.html", id_pedido = id_pedido, status = pedido['status'])
 
 @app.route("/pedido/<int:id_pedido>/", methods = ["POST"])
 def alterar_pedido_api(id_pedido):
     pedido = consultar_pedido(id_pedido)
     status = request.form['status']
     if pedido == None:
-        return render_template("menu.html", mensagem = f"Esse pedido não existe."), 404
+        return render_template("menu.html", mensagem = f"Esse pedido não existe.")
     editar_pedido(status, id_pedido)
     return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi editado com sucesso!")
 
-@app.route("/pedido/<int:id_pedido>", methods = ["DELETE"])
-def deletar_pedido_api(id_pedido):
-    pedido = consultar_pedido(id_pedido)
-    if pedido == None:
-        return render_template("menu.html", mensagem = "Esse pedido nem mesmo existia mais."), 404
-    deletar_pedido(id_pedido)
-    return render_template("menu.html", mensagem = f"O pedido {id_pedido} foi excluído com sucesso!")
-#------------------FUNÇÕES AUXILIARES----------------#
+#------------------FUNÇÕES AUXILIARES BACKEND----------------#
 def separaPedido(texto):
     lista = []
     for linha in texto.split("' '"):
@@ -256,19 +285,13 @@ def soma_total(res):
 def preco_venda(preco_unitario):
     preco_venda = preco_unitario * 1
     return preco_venda
-#---------------------------------ITENS PEDIDO-----------------------------------------------#
-@app.route("/produto/pedido/", methods = ["GET"])
-def form_prod_pedido_api():
-    return render_template("form_produto_pedido.html", preco = "", quantidade = "", descrica = "", id_pedido = "", preco_unitario = "", produtos = listar_produtos(), pedidos = listar_pedidos())
- 
-@app.route("/produto/pedido/", methods = ["POST"])
-def criar_prod_pedido_api():
-    id_produto = request.form["id_produto"]
-    quantidade = request.form['quantidade']
-    id_pedido = request.form['id_pedido']
-    preco_unitario = request.form['preco_unitario']
-    criar_prod_pedido(id_produto, id_pedido, preco_unitario, quantidade)
-    return render_template('menu.html', mensagem = 'Pedido realizado com sucesso')
+
+def trataritem(item):
+    b = re.sub('[^0-9]', '', item)
+    novalista = []
+    for x in b:
+        novalista.append(x)
+    return novalista
 
 ###############################################
 #### Funções auxiliares de banco de dados. ####
@@ -340,7 +363,8 @@ CREATE TABLE IF NOT EXISTS usuario (
     id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
     email VARCHAR(50),
     usuario VARCHAR(50),
-    senha  VARCHAR2(100)
+    senha  VARCHAR2(100),
+    senha_admin VARCHAR2(100)
 );
 """
 
@@ -425,7 +449,7 @@ def verifica_quantidade(id_produto):
 
 def atualiza_quantidade(id_produto, quantidade_pedida):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE estoque SET quantidade = quantidade - ? WHERE id_produto = ?", (quantidade_pedida, id_produto, ))
+        cur.execute(f"UPDATE estoque SET quantidade = quantidade - {quantidade_pedida}  WHERE id_produto = {id_produto}")
         con.commit()
 
 def deletar_produto_estoque(id_produto):
@@ -462,16 +486,25 @@ def consultar_produto_pedido(id_produto):
         cur.execute(query, id_produto)
         return cur.fetchall()
 
+def editar_prod_pedido(id_produto, quantidade, preco, id_pedido):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("UPDATE itens_pedido SET preco_unitario = ?, quantidade = ?, id_produto = ? WHERE id_pedido = ? AND id_produto = ?", (preco, quantidade, id_produto, id_pedido, id_produto))
+        con.commit()
+
 def editar_pedido(status, id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("UPDATE pedido SET status = ? WHERE id_pedido = ?", (status, id_pedido, ))
-        con.commit()    
+        cur.execute("UPDATE pedido SET status = ? WHERE id_pedido = ?", (status, id_pedido))
+        con.commit()      
+
+def deletar_prod_pedido(id_pedido, id_produto):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("DELETE FROM itens_pedido WHERE id_pedido = ? AND id_produto = ?", (id_pedido, id_produto, ))
+        con.commit()
 
 def deletar_pedido(id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
         cur.execute("DELETE FROM pedido WHERE id_pedido = ?", (id_pedido, ))
         con.commit()
-
 #--------------------LOGIN------------------#
 
 def inserir_novo_usuario(email, usuario, senha):
@@ -492,20 +525,25 @@ def consultar_usuario(usuario):
 
 #--------------------ITENS PEDIDO------------------#
 '''preco, quantidade, descricao, id_pedido, preco_unitario'''
-def criar_prod_pedido(id_produto, id_pedido, preco_un, pedir): 
+def criar_prod_pedido(id_produto, id_pedido, preco_un, quantidade_pedida):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("INSERT INTO itens_pedido (id_produto, id_pedido, preco_unitario, quantidade) VALUES (?, ?, ?, ?)", (id_produto, id_pedido, preco_un, pedir))
+        cur.execute("INSERT INTO itens_pedido (id_produto, id_pedido, preco_unitario, quantidade) VALUES (?, ?, ?, ?)", (id_produto, id_pedido, preco_un, quantidade_pedida))
         con.commit()
 
 def consultar_prod_pedido(id_pedido):
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT preco, quantidade, id_produto, id_pedido FROM itens_pedido p WHERE id_pedido = ?", (id_pedido, ))
+        cur.execute("SELECT p.preco_unitario, p.quantidade, p.id_produto, pd.descricao FROM itens_pedido p INNER JOIN produto pd ON pd.id_produto = p.id_produto WHERE p.id_pedido = ?", (id_pedido, ))
+        return rows_to_dict(cur.description, cur.fetchall())
+
+def consultar_itens_pedido(id_pedido, id_produto):
+    with closing(conectar()) as con, closing(con.cursor()) as cur:
+        cur.execute("SELECT p.preco_unitario, p.quantidade FROM itens_pedido p WHERE p.id_pedido = ? AND p.id_produto = ?", (id_pedido, id_produto, ))
         return row_to_dict(cur.description, cur.fetchone())
 
 def listar_itens_pedido():
     with closing(conectar()) as con, closing(con.cursor()) as cur:
-        cur.execute("SELECT i.preco, i.quantidade, i.id_produto, i.id_pedido, i.preco_unitario, p.descricao from itens_pedido i INNER JOIN produto p ON i.id_produto= p.id_produto")
-        return row_to_dict(cur.description, cur.fetchone())
+        cur.execute("SELECT i.quantidade, i.id_produto, i.id_pedido, i.preco_unitario from itens_pedido i")
+        return rows_to_dict(cur.description, cur.fetchall())
 
 
 ########################

@@ -6,8 +6,8 @@
   <title>{%block title%}Hope Company{% endblock %}</title>
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous">
-   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
-
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet">
     <style>
         body{
             background-color: #ffffff;
@@ -16,7 +16,7 @@
             /* To limit the menu width to the content of the menu: */
             display: inline-block;
             background-color: #191818;
-            width: 200px;
+            width: 180px;
             /* Or set the width explicitly: */
             /* width: 10em; */
         }
@@ -40,14 +40,23 @@
         section {
             float: right;
         }
-        #pedido{
-            position: relative;
-            top: 100px;
-            font-size: 12pt;
-            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-        }
+
         h1{
             font-family: monospace;
+        }
+        table{
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: normal;
+            font-size: 11pt;
+        }
+        aside {
+            position: relative;
+            left: 370px;
+            top: 100px;
+        }
+        #loja{
+            font-family: 'Fredericka the Great', cursive;
+            font-size: 30pt;
         }
              
     </style>
@@ -83,8 +92,8 @@
 
 <header>
     {% block navbar %}
-
-    <div class="pure-menu custom-restricted-width">
+    <nav role="navigation">
+    <div class="pure-menu custom-restricted-width" id="menuToggle">
         <span class="pure-menu-heading">Hope Company</span>
         <ul class="pure-menu-list">
             <li class="pure-menu-item">
@@ -109,11 +118,14 @@
                 <a href="/pedido/novo/" class="pure-menu-link">Realizar Pedido</a>
             </li>
             <li class="pure-menu-item">
+                <a href="/suporte/" class="pure-menu-link">Suporte</a>
+            </li>
+            <li class="pure-menu-item">
                 <a href="/" class="pure-menu-link">Sair</a>
             </li>
         </ul>
     </div>
-    
+</nav>
 </header>
 {% endblock %}
 
@@ -130,9 +142,7 @@
                 <output id="hora" style="font-family:monospace 'arial black', 'avant garde'; font-size: 12pt;"></output> 
             </div>
             </div>
-            <div style="font-family: monospace; font-size: 12pt;" id="pedido" class="container">
-                <p>Você tem # pedidos</p>
-            </div>  
+            <aside><h1 id="loja">CÂNDIDO TINTAS</h1></aside>
             {% endblock %}
         </section>     
     {% endblock %}

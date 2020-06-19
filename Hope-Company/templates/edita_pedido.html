@@ -4,16 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Produtos</title>
+    <title>Edita Pedido</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script type="text/javascript">
+       const id_pedido = "{{id_pedido}}";
        const id_produto = "{{id_produto}}";
        
         function validar() {
-            const descricao = document.getElementById('descricao');
+            const id_produto = document.getElementById('id_produto');
             const preco_unitario = document.getElementById('preco_unitario');
             const quantidade = document.getElementById('quantidade');
-            if (descricao.value == "") {
+            if (id_produto.value == "") {
                 alert("Preencha a descrição.");
                 return false
             }
@@ -43,7 +44,7 @@
         function excluir() {
             if (!confirm("Você tem certeza?")) return;
             xhr = new XMLHttpRequest();
-            xhr.open('DELETE', '/produto/' + id_produto);
+            xhr.open('DELETE', '/edita-pedido/'+ id_pedido +"/"+ id_produto);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
                 if (xhr.readyState !== 4) return;
@@ -61,20 +62,21 @@
 </head>
 
 <body>
-
-    <form class="form-horizontal" action="/produto/{{id_produto}}/" method="POST" id="form_principal">
-        {% if id_produto != 'novo'%}
+    
+    <form class="form-horizontal" action="/edita-pedido/{{id_pedido}}/{{id_produto}}/" method="POST" id="form_principal">
+        {% if id_pedido != novo %}
         <p>
-            <label>Cadastro de Produtos:</label> {{id_produto}}
+            <label>Edita Pedido:</label> {{id_pedido}}
         </p>
         {% endif %}
         <!-- Form Name -->
-        <legend>Cadastro de Produtos</legend>
+        <legend>Edita de Produtos pedidos</legend>
         <!-- Text input-->
+   
         <div class="form-group">
-            <label class="col-md-4 control-label" for="descricao">Descrição</label>
+            <label class="col-md-4 control-label" for="id_produto">Id Produto</label>
             <div class="col-md-2">
-                <input id="descricao" name="descricao" type="text" placeholder="" class="form-control input-md" value="{{descricao}}">
+                <input id="id_produto" name="id_produto" type="text" placeholder="" class="form-control input-md" value="{{id_produto}}">
 
             </div>
         </div>
@@ -107,7 +109,7 @@
             </div>
         </div>
     </form>
-    {% if id_pedido != 'novo' %}
+    {% if id_produto != 'novo' %}
     <form action="/produto/{{id_produto}}" id="delt" method="DELETE" style="display: none"></form>
     {% endif %}
 </body>
