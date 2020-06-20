@@ -10,6 +10,29 @@
     <script type="text/javascript">
         const id_pedido = "{{id_pedido}}";
 
+        function validar() {
+            const pedido = document.getElementById('pedido');
+            const cliente = document.getElementById('cliente');
+            
+            if (cliente.value == "") {
+                alert("Escolha o cliente.");
+                return false;
+            }
+            if (pedido.value == "") {
+                alert("Preencha o pedido.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function salvar() {
+            if (!validar()) return;
+            document.getElementById("form_principal").submit();
+        }
+
+</script>
+
     </script>
 
 </head>
@@ -49,7 +72,7 @@
         <div class="form-group">
             <label class="col-md-4 control-label" for="btnsalvar"></label>
             <div class="col-md-8">
-                <button type="submit" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
+                <button type="button" id="btnsalvar" name="btnsalvar" class="btn btn-primary" onclick="salvar()">Salvar</button> 
                 <a id="btncancelar" name="btncancelar" class="btn btn-danger" href="/menu">Cancelar</a>
 
             </div>

@@ -20,20 +20,23 @@
                 alert("Informe o seu nome completo");
                 return false;
             }
-            if (!sexo_masc.checked && !sexo_fem.checked) {
-                alert("Escolha o sexo.");
-                return false;
-            }
+          
             if (!telefone.value.match('^(?:\([1-9]{2}\)|[1-9]{2}) ?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$')) {
                 alert("Este número de telefone não é válido.");
+                return false;
+            }
+          
+            if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
+                alert("Preencha o e-mail corretamente");
                 return false;
             }
             if (endereco.value === '') {
                 alert("Preencha o endereço.");
                 return false;
             }
-            if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
-                alert("Preencha o e-mail corretamente");
+            
+            if (!sexo_masc.checked && !sexo_fem.checked) {
+                alert("Escolha o sexo.");
                 return false;
             }
             return true;

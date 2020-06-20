@@ -19,6 +19,10 @@
                 alert("Preencha o e-mail corretamente");
                 return false;
             }*/
+        if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
+            alert("Preencha o e-mail corretamente");
+            return false;
+        }
         
         if (usuario.value == "") {
             alert("Digite o nome de usuário");
@@ -39,11 +43,6 @@
             alert("Sua senha deve conter mais que quatro dígitos");
             return false
         }
-
-        if (!email.value.match('^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$')) {
-                alert("Preencha o e-mail corretamente");
-                return false;
-            }
         return true;
     }
 
